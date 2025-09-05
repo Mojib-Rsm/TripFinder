@@ -54,6 +54,24 @@ async function getLocationDetails(locationId: string): Promise<any> {
     return details;
 }
 
+function parsePrice(priceLevel?: string): number {
+    if (!priceLevel) return 150; // Default price
+    
+    const priceRange = priceLevel.split('-').map(p => parseInt(p.replace(/[^0-9]/g, ''), 10));
+    
+    if (priceRange.length > 1 && !isNaN(priceRange[0]) && !isNaN(priceRange[1])) {
+        // Return an average if it's a range like "$150 - $250"
+        return (priceRange[0] + priceRange[1]) / 2;
+    }
+    
+    if (priceRange.length === 1 && !isNaN(priceRange[0])) {
+        // Return the number if it's a single value like "$150"
+        return priceRange[0];
+    }
+    
+    return 150; // Fallback default price
+}
+
 function transformHotelData(details: any): Hotel {
     const amenities = details.amenities?.map((amenity: any) => ({ name: amenity.name })) || [];
     // Ensure basic amenities are present for consistency
@@ -66,7 +84,7 @@ function transformHotelData(details: any): Hotel {
         name: details.name || "Hotel name not available",
         description: details.description || "No description available.",
         location: details.address_obj?.city || details.address_obj?.country || "Location not available",
-        price: details.price_level ? parseInt(details.price_level.replace(/[^0-9]/g, ''), 10) * 100 : 150,
+        price: parsePrice(details.price_level),
         rating: parseFloat(details.rating) || 0,
         amenities,
         reviews: details.reviews?.map((review: any): Review => ({
