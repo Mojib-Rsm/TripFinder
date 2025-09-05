@@ -1,60 +1,105 @@
-import { BedDouble, Calendar, Users, Search, Star, Info, MapPin } from "lucide-react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import HotelSearchForm from "./hotel-search-form";
 
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { MapPin, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSearchHistory } from "@/hooks/use-search-history";
+import { useSearchParams } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Checkbox } from "./ui/checkbox";
+
+const formSchema = z.object({
+  location: z.string().min(2, {
+    message: "Location must be at least 2 characters.",
+  }),
+});
 
 const TripSearchForm = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { addSearchToHistory } = useSearchHistory();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      location: searchParams.get('location') || "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const { location } = values;
+    addSearchToHistory({ location, dates: {} });
+
+    const params = new URLSearchParams();
+    params.set("location", location);
+    router.push(`/search?${params.toString()}`);
+  }
+
   return (
     <div className="text-gray-800">
-      <div className="grid grid-cols-12 gap-2 mb-4">
-        <div className="col-span-12 md:col-span-4 relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input placeholder="Where to?" className="h-12 pl-10 bg-gray-100 border-gray-300" />
-        </div>
-        <div className="col-span-6 md:col-span-2">
-           <Button variant="outline" className="w-full h-12 text-muted-foreground justify-start font-normal border-gray-300">
-             <Calendar className="mr-2" />
-             Select date
-           </Button>
-        </div>
-        <div className="col-span-6 md:col-span-2">
-           <Button variant="outline" className="w-full h-12 text-muted-foreground justify-start font-normal border-gray-300">
-             <Calendar className="mr-2" />
-             Select date
-           </Button>
-        </div>
-        <div className="col-span-12 md:col-span-2">
-           <Button variant="outline" className="w-full h-12 text-muted-foreground justify-start font-normal border-gray-300">
-            <Users className="mr-2"/> 1 room, 2 adults
-           </Button>
-        </div>
-        <div className="col-span-12 md:col-span-2">
-            <Button size="lg" className="w-full h-12 bg-blue-600 hover:bg-blue-700">
-                <Search className="mr-2" />
-                Search
-            </Button>
-        </div>
-      </div>
-      <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2">
-          <Checkbox id="work-travel" className="border-gray-400" />
-          <label htmlFor="work-travel" className="flex items-center gap-1.5">
-            I'm traveling for work
-            <Info className="w-4 h-4 text-muted-foreground cursor-pointer" />
-          </label>
-        </div>
-        <div className="flex items-center gap-4">
-            <span>Star Rating</span>
-            <div className="flex items-center gap-1">
-                <Button size="sm" variant="outline" className="px-3 border-gray-300">≤ 2 <Star className="w-3 h-3 ml-1 fill-yellow-400 text-yellow-400" /></Button>
-                <Button size="sm" variant="outline" className="px-3 border-gray-300">3 <Star className="w-3 h-3 ml-1 fill-yellow-400 text-yellow-400" /></Button>
-                <Button size="sm" variant="outline" className="px-3 border-gray-300">4 <Star className="w-3 h-3 ml-1 fill-yellow-400 text-yellow-400" /></Button>
-                <Button size="sm" variant="outline" className="px-3 border-gray-300">5 <Star className="w-3 h-3 ml-1 fill-yellow-400 text-yellow-400" /></Button>
+      <Tabs defaultValue="hotels" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-transparent p-0 mb-4">
+          <TabsTrigger value="hotels" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Hotels & Homes</TabsTrigger>
+          <TabsTrigger value="flights" disabled>Flights</TabsTrigger>
+          <TabsTrigger value="trains" disabled>Trains</TabsTrigger>
+          <TabsTrigger value="cars" disabled>Car Services</TabsTrigger>
+          <TabsTrigger value="tours" disabled>Attractions & Tours</TabsTrigger>
+        </TabsList>
+        <TabsContent value="hotels">
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="grid grid-cols-1 md:grid-cols-12 gap-2"
+                >
+                    <div className="md:col-span-10">
+                        <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormControl>
+                                <div className="relative">
+                                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search destinations"
+                                    {...field}
+                                    className="h-14 text-base bg-gray-100 rounded-md pl-12 pr-4 text-foreground w-full"
+                                />
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    </div>
+                    <div className="md:col-span-2">
+                        <Button type="submit" size="lg" className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold">
+                            <Search className="mr-2 h-5 w-5" />
+                            Search
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+            <div className="flex items-center mt-4">
+                <Checkbox id="work-travel" />
+                <label htmlFor="work-travel" className="ml-2 text-sm">
+                    I'm traveling for work
+                </label>
             </div>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
