@@ -13,16 +13,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Plane, Search, Hotel, CalendarIcon, Users, Star } from "lucide-react";
+import { Plane, Search, Hotel } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSearchHistory } from "@/hooks/use-search-history";
 import { useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { cn } from "@/lib/utils";
-import { Calendar } from "./ui/calendar";
-import { format } from "date-fns";
-import AirportInput from "./airport-input";
+import { useEffect } from "react";
 
 const hotelFormSchema = z.object({
   location: z.string().min(2, {
@@ -30,14 +26,27 @@ const hotelFormSchema = z.object({
   }),
 });
 
-const flightFormSchema = z.object({
-  origin: z.string().min(3, "Please enter a valid origin IATA code.").max(3, "IATA codes are 3 characters."),
-  destination: z.string().min(3, "Please enter a valid destination IATA code.").max(3, "IATA codes are 3 characters."),
-  depart_date: z.date({
-    required_error: "A departure date is required.",
-  }),
-  return_date: z.date().optional(),
-});
+const FlightWidget = () => {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://tpembd.com/content?currency=bdt&trs=450435&shmarker=592431&show_hotels=true&powered_by=true&locale=en&searchUrl=www.aviasales.com%2Fsearch&primary_override=%2332a8dd&color_button=%2332a8dd&color_icons=%2332a8dd&dark=%23262626&light=%23FFFFFF&secondary=%23FFFFFF&special=%23C4C4C4&color_focused=%2332a8dd&border_radius=0&plain=false&promo_id=7879&campaign_id=100';
+    script.async = true;
+    script.charset = 'utf-8';
+
+    const container = document.getElementById('flight-widget-container');
+    if (container) {
+      container.appendChild(script);
+    }
+    
+    return () => {
+      if (container && container.contains(script)) {
+        container.removeChild(script);
+      }
+    }
+  }, []);
+
+  return <div id="flight-widget-container"></div>;
+}
 
 
 const TripSearchForm = () => {
@@ -52,9 +61,6 @@ const TripSearchForm = () => {
     },
   });
 
-  const flightForm = useForm<z.infer<typeof flightFormSchema>>({
-    resolver: zodResolver(flightFormSchema),
-  });
 
   function onHotelSubmit(values: z.infer<typeof hotelFormSchema>) {
     const { location } = values;
@@ -65,19 +71,6 @@ const TripSearchForm = () => {
     router.push(`/search?${params.toString()}`);
   }
 
-  function onFlightSubmit(values: z.infer<typeof flightFormSchema>) {
-    const params = new URLSearchParams({
-      origin: values.origin.toUpperCase(),
-      destination: values.destination.toUpperCase(),
-      depart_date: format(values.depart_date, "yyyy-MM-dd"),
-    });
-
-    if (values.return_date) {
-      params.append("return_date", format(values.return_date, "yyyy-MM-dd"));
-    }
-
-    router.push(`/flights?${params.toString()}`);
-  }
 
   return (
     <div className="text-gray-800">
@@ -122,132 +115,7 @@ const TripSearchForm = () => {
             </Form>
         </TabsContent>
         <TabsContent value="flights">
-             <Form {...flightForm}>
-                <form
-                    onSubmit={flightForm.handleSubmit(onFlightSubmit)}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end"
-                >
-                    <div className="md:col-span-3">
-                        <FormField
-                        control={flightForm.control}
-                        name="origin"
-                        render={({ field }) => (
-                             <FormItem>
-                                <FormControl>
-                                    <AirportInput 
-                                      placeholder="Origin"
-                                      value={field.value}
-                                      onChange={(value) => field.onChange(value)}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    </div>
-                     <div className="md:col-span-3">
-                        <FormField
-                        control={flightForm.control}
-                        name="destination"
-                        render={({ field }) => (
-                             <FormItem>
-                                <FormControl>
-                                    <AirportInput
-                                      placeholder="Destination"
-                                      value={field.value}
-                                      onChange={(value) => field.onChange(value)}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    </div>
-                    <div className="md:col-span-2">
-                         <FormField
-                            control={flightForm.control}
-                            name="depart_date"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full h-14 justify-start text-left font-normal bg-gray-100 border-0",
-                                            !field.value && "text-muted-foreground"
-                                        )}
-                                        >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {field.value ? (
-                                            format(field.value, "PPP")
-                                        ) : (
-                                            <span>Depart date</span>
-                                        )}
-                                        </Button>
-                                    </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        disabled={(date) => date < new Date()}
-                                        initialFocus
-                                    />
-                                    </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
-                    </div>
-                     <div className="md:col-span-2">
-                         <FormField
-                            control={flightForm.control}
-                            name="return_date"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full h-14 justify-start text-left font-normal bg-gray-100 border-0",
-                                            !field.value && "text-muted-foreground"
-                                        )}
-                                        >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {field.value ? (
-                                            format(field.value, "PPP")
-                                        ) : (
-                                            <span>Return date</span>
-                                        )}
-                                        </Button>
-                                    </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        disabled={(date) => date < flightForm.getValues("depart_date")}
-                                        initialFocus
-                                    />
-                                    </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
-                    </div>
-                    <div className="md:col-span-2">
-                        <Button type="submit" size="lg" className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold">
-                            Search Flights
-                        </Button>
-                    </div>
-                </form>
-            </Form>
+            <FlightWidget />
         </TabsContent>
       </Tabs>
     </div>
