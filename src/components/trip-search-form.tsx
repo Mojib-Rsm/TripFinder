@@ -246,7 +246,7 @@ const TripSearchForm = () => {
                     <FormItem>
                       <FormControl>
                         <Input
-                          placeholder="Enter a city or destination"
+                          placeholder="Enter an area or hotel name"
                           className="h-14 text-base bg-gray-100"
                           {...field}
                         />
