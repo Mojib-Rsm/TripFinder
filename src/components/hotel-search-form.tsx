@@ -11,7 +11,7 @@ import {
   FormItem,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSearchHistory } from "@/hooks/use-search-history";
 import { useSearchParams } from 'next/navigation'
@@ -56,18 +56,18 @@ export default function HotelSearchForm() {
             <FormItem>
               <FormControl>
                 <div className="relative">
-                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                    <Input
-                    placeholder="Places to go, things to do, hotels..."
+                    placeholder="Search destinations"
                     {...field}
-                    className="h-14 text-base bg-white rounded-full pl-12 pr-32 text-black"
+                    className="h-14 text-base bg-white rounded-md pl-12 pr-32 text-foreground"
                   />
                 </div>
               </FormControl>
             </FormItem>
           )}
         />
-        <Button type="submit" size="lg" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-full bg-green-500 hover:bg-green-600 text-white font-bold">
+        <Button type="submit" size="lg" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold">
           Search
         </Button>
       </form>
