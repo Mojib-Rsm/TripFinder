@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MapPin, Search } from "lucide-react";
+import { Plane, Search, Hotel } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSearchHistory } from "@/hooks/use-search-history";
 import { useSearchParams } from 'next/navigation';
@@ -50,18 +50,15 @@ const TripSearchForm = () => {
   return (
     <div className="text-gray-800">
       <Tabs defaultValue="hotels" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-transparent p-0 mb-4">
-          <TabsTrigger value="hotels" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Hotels & Homes</TabsTrigger>
-          <TabsTrigger value="flights" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Flights</TabsTrigger>
-          <TabsTrigger value="trains" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Trains</TabsTrigger>
-          <TabsTrigger value="cars" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Car Services</TabsTrigger>
-          <TabsTrigger value="tours" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Attractions & Tours</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-transparent p-0 mb-4 max-w-xs mx-auto md:mx-0">
+          <TabsTrigger value="hotels" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none flex items-center gap-2"><Hotel />Hotels</TabsTrigger>
+          <TabsTrigger value="flights" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none flex items-center gap-2"><Plane/>Flights</TabsTrigger>
         </TabsList>
         <TabsContent value="hotels">
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-2"
+                    className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end"
                 >
                     <div className="md:col-span-10">
                         <FormField
@@ -71,9 +68,9 @@ const TripSearchForm = () => {
                             <FormItem>
                             <FormControl>
                                 <div className="relative">
-                                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input
-                                    placeholder="Search destinations"
+                                    placeholder="Enter a destination or hotel"
                                     {...field}
                                     className="h-14 text-base bg-gray-100 rounded-md pl-12 pr-4 text-foreground w-full"
                                 />
@@ -85,24 +82,14 @@ const TripSearchForm = () => {
                         />
                     </div>
                     <div className="md:col-span-2">
-                        <Button type="submit" size="lg" className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold">
-                            <Search className="mr-2 h-5 w-5" />
-                            Search
+                        <Button type="submit" size="lg" className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold">
+                            Search Hotels
                         </Button>
                     </div>
                 </form>
             </Form>
-            <div className="flex items-center mt-4">
-                <Checkbox id="work-travel" />
-                <label htmlFor="work-travel" className="ml-2 text-sm">
-                    I'm traveling for work
-                </label>
-            </div>
         </TabsContent>
         <TabsContent value="flights"><p className="text-center p-8">Flight search is coming soon!</p></TabsContent>
-        <TabsContent value="trains"><p className="text-center p-8">Train search is coming soon!</p></TabsContent>
-        <TabsContent value="cars"><p className="text-center p-8">Car service search is coming soon!</p></TabsContent>
-        <TabsContent value="tours"><p className="text-center p-8">Tour search is coming soon!</p></TabsContent>
       </Tabs>
     </div>
   );
