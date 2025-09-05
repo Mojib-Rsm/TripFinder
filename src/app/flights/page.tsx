@@ -1,12 +1,16 @@
-
 // src/app/flights/page.tsx
-import { getFlights } from "@/lib/data";
-import { Flight } from "@/lib/types";
+import { getFlights } from '@/lib/data';
+import { Flight } from '@/lib/types';
 import { format } from 'date-fns';
-import { Plane, ArrowRight, ExternalLink } from "lucide-react";
+import { Plane, ArrowRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 function FlightCard({ flight }: { flight: Flight }) {
   const partnerId = process.env.AVIASALES_PARTNER_ID;
@@ -17,46 +21,64 @@ function FlightCard({ flight }: { flight: Flight }) {
       <CardHeader>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Plane className="w-5 h-5 text-primary"/>
-            <CardTitle className="text-lg">{flight.airline} {flight.flight_number}</CardTitle>
+            <Plane className="w-5 h-5 text-primary" />
+            <CardTitle className="text-lg">
+              {flight.airline} {flight.flight_number}
+            </CardTitle>
           </div>
-          <div className="text-lg font-bold text-primary">
-            ${flight.price}
-          </div>
+          <div className="text-lg font-bold text-primary">${flight.price}</div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="flex justify-between items-center text-sm text-muted-foreground mb-4">
           <div className="flex flex-col items-start">
-            <span className="font-bold text-xl text-foreground">{flight.origin}</span>
+            <span className="font-bold text-xl text-foreground">
+              {flight.origin}
+            </span>
             <span className="text-xs">{flight.origin_airport}</span>
           </div>
           <div className="flex flex-col items-center">
-             <ArrowRight className="w-5 h-5"/>
-             <span className="text-xs mt-1">{flight.transfers} {flight.transfers === 1 ? 'stop' : 'stops'}</span>
+            <ArrowRight className="w-5 h-5" />
+            <span className="text-xs mt-1">
+              {flight.transfers} {flight.transfers === 1 ? 'stop' : 'stops'}
+            </span>
           </div>
           <div className="flex flex-col items-end text-right">
-            <span className="font-bold text-xl text-foreground">{flight.destination}</span>
+            <span className="font-bold text-xl text-foreground">
+              {flight.destination}
+            </span>
             <span className="text-xs">{flight.destination_airport}</span>
           </div>
         </div>
         <div className="flex justify-between items-center text-sm border-t pt-4">
-            <div>
-                <p><strong>Depart:</strong> {format(new Date(flight.departure_at), 'MMM d, yyyy HH:mm')}</p>
-                {flight.return_at && <p><strong>Return:</strong> {format(new Date(flight.return_at), 'MMM d, yyyy HH:mm')}</p>}
-            </div>
-            <Button asChild>
-                <Link href={flightLink} target="_blank" rel="noopener noreferrer">
-                    Book Now <ExternalLink className="w-4 h-4 ml-2" />
-                </Link>
-            </Button>
+          <div>
+            <p>
+              <strong>Depart:</strong>{' '}
+              {format(new Date(flight.departure_at), 'MMM d, yyyy HH:mm')}
+            </p>
+            {flight.return_at && (
+              <p>
+                <strong>Return:</strong>{' '}
+                {format(new Date(flight.return_at), 'MMM d, yyyy HH:mm')}
+              </p>
+            )}
+          </div>
+          <Button asChild>
+            <Link href={flightLink} target="_blank" rel="noopener noreferrer">
+              Book Now <ExternalLink className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-export default async function FlightsPage({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+export default async function FlightsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
   const { origin, destination, depart_date, return_date } = searchParams;
 
   if (!origin || !destination || !depart_date) {
@@ -65,7 +87,7 @@ export default async function FlightsPage({ searchParams }: { searchParams: { [k
         <h1 className="text-2xl font-bold">Invalid Search</h1>
         <p>Please provide origin, destination, and departure date.</p>
         <Button asChild className="mt-4">
-            <Link href="/">Go back to search</Link>
+          <Link href="/">Go back to search</Link>
         </Button>
       </div>
     );
@@ -73,47 +95,82 @@ export default async function FlightsPage({ searchParams }: { searchParams: { [k
 
   let flights: Flight[] = [];
   let error: string | null = null;
+  let alternativeOrigin: any = null;
+  let alternativeDestination: any = null;
+
   try {
-     flights = await getFlights({ origin, destination, depart_date, return_date });
-  } catch(e: any) {
+    const result = await getFlights({
+      origin,
+      destination,
+      depart_date,
+      return_date,
+    });
+    flights = result.flights;
+    alternativeOrigin = result.alternativeOrigin;
+    alternativeDestination = result.alternativeDestination;
+  } catch (e: any) {
     console.error(e);
-    error = e.message || "An unknown error occurred while fetching flights.";
+    error = e.message || 'An unknown error occurred while fetching flights.';
   }
+
+  const hasAlternatives =
+    (alternativeOrigin && alternativeOrigin.airports.length > 0) ||
+    (alternativeDestination && alternativeDestination.airports.length > 0);
 
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-2">Flight Results</h1>
         <p className="text-muted-foreground mb-8">
-            Showing flights from {origin} to {destination}
+          Showing flights from {origin} to {destination}
         </p>
 
-        {error && 
-            <div className="p-4 rounded-md bg-destructive text-destructive-foreground text-center">
-                <p className="font-bold mb-2">Error fetching flights</p>
-                <p className="mb-4">{error}</p>
-                 <Button asChild variant="secondary">
-                    <Link href="/">Go back to search</Link>
-                </Button>
-            </div>
-        }
+        {error && (
+          <div className="p-4 rounded-md bg-destructive text-destructive-foreground text-center">
+            <p className="font-bold mb-2">Error fetching flights</p>
+            <p className="mb-4">{error}</p>
+            <Button asChild variant="secondary">
+              <Link href="/">Go back to search</Link>
+            </Button>
+          </div>
+        )}
 
         {!error && flights.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
-            {flights.map(flight => (
+            {flights.map((flight) => (
               <FlightCard key={flight.id} flight={flight} />
             ))}
           </div>
         ) : (
-          !error && <div className="text-center py-16 border-2 border-dashed rounded-lg">
-            <h3 className="text-xl font-semibold">No flights found</h3>
-            <p className="text-muted-foreground mt-2">
-              We couldn't find any flights for the selected criteria. Try a different search.
-            </p>
-             <Button asChild className="mt-4">
+          !error && (
+            <div className="text-center py-16 border-2 border-dashed rounded-lg">
+              <h3 className="text-xl font-semibold">No flights found</h3>
+              <p className="text-muted-foreground mt-2 mb-4">
+                We couldn't find any flights for the selected criteria.
+              </p>
+              {hasAlternatives && (
+                <div className="mb-6">
+                  <h4 className="font-semibold text-lg mb-3">
+                    Try searching from a nearby airport?
+                  </h4>
+                  <div className="flex gap-4 justify-center">
+                    {alternativeOrigin?.airports.map((alt: any) => (
+                      <Button key={alt.code} variant="outline" asChild>
+                        <Link
+                          href={`/flights?origin=${alt.code}&destination=${destination}&depart_date=${depart_date}${return_date ? `&return_date=${return_date}` : ''}`}
+                        >
+                          Search from {alt.name} ({alt.code})
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <Button asChild className="mt-4">
                 <Link href="/">Go back to search</Link>
-            </Button>
-          </div>
+              </Button>
+            </div>
+          )
         )}
       </div>
     </div>
