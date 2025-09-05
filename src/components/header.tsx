@@ -20,7 +20,7 @@ const Header = () => {
             <Button asChild variant="ghost"><Link href="/">Home</Link></Button>
             <Button asChild variant="ghost"><Link href="/flights">Flights</Link></Button>
             <Button asChild variant="ghost"><Link href="/hotels">Hotels</Link></Button>
-            <Button asChild variant="ghost"><Link href="/">Contact</Link></Button>
+            <Button asChild variant="ghost"><Link href="/contact">Contact</Link></Button>
         </nav>
         <div className="hidden md:flex items-center gap-4">
             <Button variant="outline">List Your Property</Button>
