@@ -52,10 +52,10 @@ const TripSearchForm = () => {
       <Tabs defaultValue="hotels" className="w-full">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-transparent p-0 mb-4">
           <TabsTrigger value="hotels" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Hotels & Homes</TabsTrigger>
-          <TabsTrigger value="flights" disabled>Flights</TabsTrigger>
-          <TabsTrigger value="trains" disabled>Trains</TabsTrigger>
-          <TabsTrigger value="cars" disabled>Car Services</TabsTrigger>
-          <TabsTrigger value="tours" disabled>Attractions & Tours</TabsTrigger>
+          <TabsTrigger value="flights" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Flights</TabsTrigger>
+          <TabsTrigger value="trains" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Trains</TabsTrigger>
+          <TabsTrigger value="cars" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Car Services</TabsTrigger>
+          <TabsTrigger value="tours" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Attractions & Tours</TabsTrigger>
         </TabsList>
         <TabsContent value="hotels">
             <Form {...form}>
@@ -99,6 +99,10 @@ const TripSearchForm = () => {
                 </label>
             </div>
         </TabsContent>
+        <TabsContent value="flights"><p className="text-center p-8">Flight search is coming soon!</p></TabsContent>
+        <TabsContent value="trains"><p className="text-center p-8">Train search is coming soon!</p></TabsContent>
+        <TabsContent value="cars"><p className="text-center p-8">Car service search is coming soon!</p></TabsContent>
+        <TabsContent value="tours"><p className="text-center p-8">Tour search is coming soon!</p></TabsContent>
       </Tabs>
     </div>
   );

@@ -10,15 +10,15 @@ const Header = () => {
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">
-              Trip.com
+              TripFinder
             </h1>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
-            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Hotels & Homes</Button>
-            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Flights</Button>
-            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Trains</Button>
-            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Car Services</Button>
-            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Attractions & Tours</Button>
+            <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><Link href="/search">Hotels & Homes</Link></Button>
+            <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><Link href="/search">Flights</Link></Button>
+            <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><Link href="/search">Trains</Link></Button>
+            <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><Link href="/search">Car Services</Link></Button>
+            <Button asChild variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><Link href="/search">Attractions & Tours</Link></Button>
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
               <Ellipsis />
             </Button>
@@ -26,7 +26,7 @@ const Header = () => {
         </div>
         <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">List Your Property</Button>
-            <span className="text-sm">BDT</span>
+            <span className="text-sm">USD</span>
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Customer Support</Button>
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
               <CircleUserRound className="w-6 h-6"/>
