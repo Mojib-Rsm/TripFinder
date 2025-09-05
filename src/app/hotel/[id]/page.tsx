@@ -37,11 +37,12 @@ export default async function HotelPage({
     notFound();
   }
 
-  const partnerId = process.env.TRIPCOM_PARTNER_ID || "12345";
+  const tripComPartnerId = process.env.TRIPCOM_PARTNER_ID || "12345";
   const bookingLink =
-    hotel.web_url
-      ? `${hotel.web_url.split("?")[0]}?partnerextid=${partnerId}`
-      : `https://www.trip.com/hotels/detail?hotelId=${hotel.id}&cityId=1&checkIn=2024-09-15&checkOut=2024-09-16&adult=2&children=0&subpage=detail&partnerextid=${partnerId}`;
+    hotel.web_url && hotel.web_url.includes('tripadvisor')
+      ? hotel.web_url // Use the direct tripadvisor link
+      : `https://www.trip.com/hotels/detail?hotelId=${hotel.id}&cityId=1&checkIn=2024-09-15&checkOut=2024-09-16&adult=2&children=0&subpage=detail&partnerextid=${tripComPartnerId}`;
+
 
   return (
     <div className="bg-gray-50">
@@ -184,7 +185,7 @@ export default async function HotelPage({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Book Now on Trip.com
+                      Book Now
                     </Link>
                   </Button>
                 </CardContent>

@@ -4,9 +4,56 @@ import { format } from 'date-fns';
 import { findNearbyAirportsFlow } from '@/ai/flows/nearby-airport-tool';
 
 const AVIASALES_API_KEY = process.env.AVIASALES_API_KEY;
-const AVIASALES_PARTNER_ID = process.env.AVIASALES_PARTNER_ID;
+const AVIASALES_PARTNER_ID = process.env.AVIASALES_PARTNER_ID || '592431';
+const TRIPADVISOR_API_KEY = process.env.TRIPADVISOR_API_KEY;
+const TRIPADVISOR_API_URL = 'https://api.tripadvisor.com/api/internal/v1';
 
-// Mock data to avoid API errors without a valid key.
+async function makeTripAdvisorRequest(endpoint: string, params: URLSearchParams) {
+  if (!TRIPADVISOR_API_KEY || TRIPADVISOR_API_KEY === 'YOUR_TRIPADVISOR_API_KEY') {
+    console.warn(
+      'TripAdvisor API key not found or is a placeholder. Using mock data. Please add a valid TRIPADVISOR_API_KEY to your .env file.'
+    );
+    return null;
+  }
+
+  params.set('key', TRIPADVISOR_API_KEY);
+  const response = await fetch(`${TRIPADVISOR_API_URL}${endpoint}?${params.toString()}`, {
+    method: 'GET',
+    headers: { accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    console.error(await response.text());
+    throw new Error(`TripAdvisor API request failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+async function getLocationDetails(locationId: string) {
+  const params = new URLSearchParams({
+    language: 'en',
+    currency: 'USD',
+  });
+  return makeTripAdvisorRequest(`/location/${locationId}/details`, params);
+}
+
+async function getLocationPhotos(locationId: string) {
+  const params = new URLSearchParams({
+    language: 'en',
+    limit: '10',
+  });
+  return makeTripAdvisorRequest(`/location/${locationId}/photos`, params);
+}
+
+async function getLocationReviews(locationId: string) {
+  const params = new URLSearchParams({
+    language: 'en',
+    limit: '5',
+  });
+  return makeTripAdvisorRequest(`/location/${locationId}/reviews`, params);
+}
+
 const mockAmenities: { name: string }[] = [
   { name: 'Wi-Fi' },
   { name: 'Air Conditioning' },
@@ -102,15 +149,83 @@ const mockHotels: Hotel[] = [
 export async function getHotelsByLocation(
   searchQuery: string
 ): Promise<Hotel[]> {
-  console.log(`Searching for hotels in (mock): ${searchQuery}`);
-  // Return all mock hotels, but in a real app you'd filter by searchQuery
-  return Promise.resolve(mockHotels);
+  const searchParams = new URLSearchParams({
+    searchQuery,
+    category: 'hotels',
+    language: 'en',
+  });
+  const searchResults = await makeTripAdvisorRequest('/location/search', searchParams);
+  
+  if (!searchResults || !searchResults.data) {
+    return Promise.resolve(mockHotels.filter(h => h.location.toLowerCase() === searchQuery.toLowerCase()));
+  }
+
+  const hotelData = searchResults.data.slice(0, 4);
+
+  const hotels = await Promise.all(
+    hotelData.map(async (hotel: any) => {
+      const [details, photos, reviews] = await Promise.all([
+        getLocationDetails(hotel.locationId),
+        getLocationPhotos(hotel.locationId),
+        getLocationReviews(hotel.locationId),
+      ]);
+
+      if (!details) return null;
+
+      return {
+        id: hotel.locationId,
+        name: details.name || 'No name',
+        description: details.description || 'No description available.',
+        location: details.address_obj?.city || details.address_obj?.address_string || 'Unknown location',
+        price: parseInt(details.price_level?.replace(/[^0-9]/g, ''), 10) * 100 || 150,
+        rating: details.rating || 0,
+        amenities: details.amenities?.map((a: any) => ({ name: a.name })) || [],
+        reviews: reviews?.data?.map((r: any) => ({
+          author: r.user.username,
+          rating: r.rating,
+          comment: r.text,
+        })) || [],
+        gallery: photos?.data?.map((p: any) => p.images.large.url) || [],
+        web_url: details.web_url,
+        styles: details.styles,
+        spoken_languages: details.spoken_languages?.map((l: any) => l.name) || [],
+      };
+    })
+  );
+
+  return hotels.filter((hotel): hotel is Hotel => hotel !== null);
 }
 
 export async function getHotelById(hotelId: string): Promise<Hotel | null> {
-    console.log(`Fetching hotel by id (mock): ${hotelId}`);
-    const hotel = mockHotels.find(h => h.id === hotelId);
-    return Promise.resolve(hotel || null);
+    const [details, photos, reviews] = await Promise.all([
+      getLocationDetails(hotelId),
+      getLocationPhotos(hotelId),
+      getLocationReviews(hotelId),
+    ]);
+
+    if (!details) {
+      const mockHotel = mockHotels.find(h => h.id === hotelId);
+      return Promise.resolve(mockHotel || null);
+    }
+    
+    return {
+      id: hotelId,
+      name: details.name || 'No name',
+      description: details.description || 'No description available.',
+      location: details.address_obj?.city || details.address_obj?.address_string || 'Unknown location',
+      price: parseInt(details.price_level?.replace(/[^0-9]/g, ''), 10) * 100 || 150,
+      rating: details.rating || 0,
+      amenities: details.amenities?.map((a: any) => ({ name: a.name })) || [],
+      reviews: reviews?.data?.map((r: any) => ({
+        author: r.user.username,
+        rating: r.rating,
+        comment: r.text,
+      })) || [],
+      gallery: photos?.data?.map((p: any) => p.images.large.url) || [],
+      web_url: details.web_url,
+      styles: details.styles,
+      spoken_languages: details.spoken_languages?.map((l: any) => l.name) || [],
+    };
 }
 
 // The following functions are to support generateStaticParams, which requires a non-dynamic data source.
