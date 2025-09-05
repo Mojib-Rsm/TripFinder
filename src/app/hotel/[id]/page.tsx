@@ -135,8 +135,8 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
               <CardTitle>Amenities</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {hotel.amenities.map((amenity) => (
-                <div key={amenity.name} className="flex items-center gap-3">
+              {hotel.amenities.map((amenity, index) => (
+                <div key={`${amenity.name}-${index}`} className="flex items-center gap-3">
                   {amenityIcons[amenity.name] || amenityIcons.default}
                   <span className="text-foreground">{amenity.name}</span>
                 </div>
