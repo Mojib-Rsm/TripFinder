@@ -42,7 +42,7 @@ const HotelCard = ({ hotel }: HotelCardProps) => {
         </CardContent>
         <CardFooter>
           <p className="text-lg font-semibold text-foreground">
-            ৳{hotel.price}
+            ${hotel.price}
             <span className="text-sm font-normal text-muted-foreground">
               {" "}
               / night
