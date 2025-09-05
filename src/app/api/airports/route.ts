@@ -1,3 +1,4 @@
+
 // src/app/api/airports/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -27,6 +28,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('API route error:', error);
-    return NextResponse.json({ message: 'Error fetching airport data' }, { status: 500 });
+    return NextResponse.json([], { status: 500 });
   }
 }
