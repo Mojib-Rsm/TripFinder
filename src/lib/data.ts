@@ -73,7 +73,7 @@ function parsePrice(priceLevel?: string): number {
 }
 
 function transformHotelData(details: any): Hotel {
-    const amenities = details.amenities?.map((amenity: any) => ({ name: amenity.name })) || [];
+    const amenities = details.amenities?.map((amenity: any) => ({ name: amenity.name })).filter((amenity: any) => amenity.name) || [];
     // Ensure basic amenities are present for consistency
     if (!amenities.find((a: any) => a.name === 'Wi-Fi')) amenities.push({ name: 'Wi-Fi'});
     if (!amenities.find((a: any) => a.name === 'Air Conditioning')) amenities.push({ name: 'Air Conditioning'});
