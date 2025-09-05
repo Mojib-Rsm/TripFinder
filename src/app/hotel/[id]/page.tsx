@@ -78,6 +78,19 @@ export default async function HotelPage({
                   </div>
                 </CarouselItem>
               ))}
+               {hotel.gallery.length === 0 && (
+                <CarouselItem>
+                  <div className="relative h-[500px] w-full">
+                    <Image
+                      src="https://picsum.photos/1200/500"
+                      alt="Placeholder image"
+                      fill
+                      className="object-cover rounded-lg"
+                      data-ai-hint="hotel building"
+                    />
+                  </div>
+                </CarouselItem>
+              )}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
