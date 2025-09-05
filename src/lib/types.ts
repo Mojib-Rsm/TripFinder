@@ -39,3 +39,11 @@ export interface Flight {
     duration: number;
     link: string;
 }
+
+export interface Airport {
+    code: string;
+    name: string;
+    country_code: string;
+    city_code: string;
+    time_zone: string;
+}

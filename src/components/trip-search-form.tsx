@@ -22,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
+import AirportInput from "./airport-input";
 
 const hotelFormSchema = z.object({
   location: z.string().min(2, {
@@ -30,8 +31,8 @@ const hotelFormSchema = z.object({
 });
 
 const flightFormSchema = z.object({
-  origin: z.string().min(3, "Please enter a valid origin IATA code."),
-  destination: z.string().min(3, "Please enter a valid destination IATA code."),
+  origin: z.string().min(3, "Please enter a valid origin IATA code.").max(3, "IATA codes are 3 characters."),
+  destination: z.string().min(3, "Please enter a valid destination IATA code.").max(3, "IATA codes are 3 characters."),
   depart_date: z.date({
     required_error: "A departure date is required.",
   }),
@@ -133,7 +134,11 @@ const TripSearchForm = () => {
                         render={({ field }) => (
                              <FormItem>
                                 <FormControl>
-                                    <Input placeholder="Origin (e.g., DAC)" {...field} className="h-14 text-base bg-gray-100"/>
+                                    <AirportInput 
+                                      placeholder="Origin"
+                                      value={field.value}
+                                      onChange={(value) => field.onChange(value)}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -146,7 +151,11 @@ const TripSearchForm = () => {
                         render={({ field }) => (
                              <FormItem>
                                 <FormControl>
-                                    <Input placeholder="Destination (e.g., JFK)" {...field} className="h-14 text-base bg-gray-100"/>
+                                    <AirportInput
+                                      placeholder="Destination"
+                                      value={field.value}
+                                      onChange={(value) => field.onChange(value)}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

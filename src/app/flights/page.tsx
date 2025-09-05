@@ -3,7 +3,7 @@
 import { getFlights } from "@/lib/data";
 import { Flight } from "@/lib/types";
 import { format } from 'date-fns';
-import { Plane, Clock, DollarSign, ArrowRight, ExternalLink } from "lucide-react";
+import { Plane, ArrowRight, ExternalLink } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +85,15 @@ export default async function FlightsPage({ searchParams }: { searchParams: { [k
             Showing flights from {origin} to {destination}
         </p>
 
-        {error && <div className="p-4 rounded-md bg-destructive text-destructive-foreground">{error}</div>}
+        {error && 
+            <div className="p-4 rounded-md bg-destructive text-destructive-foreground text-center">
+                <p className="font-bold mb-2">Error fetching flights</p>
+                <p className="mb-4">{error}</p>
+                 <Button asChild variant="secondary">
+                    <Link href="/">Go back to search</Link>
+                </Button>
+            </div>
+        }
 
         {!error && flights.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
