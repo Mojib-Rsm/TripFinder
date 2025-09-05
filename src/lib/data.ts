@@ -15,17 +15,18 @@ async function makeTripAdvisorRequest(endpoint: string, params: URLSearchParams)
     );
     return null;
   }
+  
+  const url = `${TRIPADVISOR_API_URL}${endpoint}?key=${TRIPADVISOR_API_KEY}&${params.toString()}`;
 
-  params.set('key', TRIPADVISOR_API_KEY);
-  const response = await fetch(`${TRIPADVISOR_API_URL}${endpoint}?${params.toString()}`, {
+  const response = await fetch(url, {
     method: 'GET',
     headers: { accept: 'application/json' },
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`TripAdvisor API request failed: ${response.statusText}`, errorText);
-    throw new Error(`TripAdvisor API request failed: ${response.statusText}`);
+    const errorBody = await response.text();
+    console.error(`TripAdvisor API request failed: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`TripAdvisor API request failed: ${response.statusText}, ${errorBody}`);
   }
 
   return response.json();
@@ -160,6 +161,7 @@ export async function getHotelsByLocation(
     
     if (!searchResults || !searchResults.data) {
       // Fallback to mock data if API fails or returns no data
+      console.warn('API returned no data, falling back to mock hotels.');
       return mockHotels.filter(h => h.location.toLowerCase().includes(searchQuery.toLowerCase()));
     }
 
@@ -173,7 +175,7 @@ export async function getHotelsByLocation(
       rating: (Math.random() * 1.5 + 3.5), // Placeholder rating between 3.5 and 5.0
       amenities: [],
       reviews: [],
-      gallery: [`https://picsum.photos/400/300?random=${hotel.location_id}`],
+      gallery: [`https://media-cdn.tripadvisor.com/media/photo-s/29/18/88/68/exterior.jpg`],
     }));
 
     return hotels;
@@ -193,7 +195,9 @@ export async function getHotelById(hotelId: string): Promise<Hotel | null> {
       ]);
 
       if (!details) {
-        return null;
+         console.warn(`No details found for hotel ${hotelId}, falling back to mock data.`);
+         const mockHotel = mockHotels.find(h => h.id === hotelId);
+         return Promise.resolve(mockHotel || null);
       }
       
       return {
@@ -209,9 +213,9 @@ export async function getHotelById(hotelId: string): Promise<Hotel | null> {
           rating: r.rating,
           comment: r.text,
         })) || [],
-        gallery: photos?.data?.map((p: any) => p.images.large.url) || [],
+        gallery: photos?.data?.map((p: any) => p.images.large.url) || [`https://picsum.photos/800/600?random=${hotelId}`],
         web_url: details.web_url,
-        styles: details.styles,
+        styles: details.hotel_class,
         spoken_languages: details.spoken_languages?.map((l: any) => l.name) || [],
       };
     } catch(error) {

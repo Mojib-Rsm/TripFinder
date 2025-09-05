@@ -36,7 +36,7 @@ export default async function HotelPage({
   if (!hotel) {
     notFound();
   }
-
+  
   const tripComPartnerId = process.env.TRIPCOM_PARTNER_ID || "12345";
   const bookingLink =
     hotel.web_url || `https://www.trip.com/hotels/detail?hotelId=${hotel.id}&cityId=1&checkIn=2024-09-15&checkOut=2024-09-16&adult=2&children=0&subpage=detail&partnerextid=${tripComPartnerId}`;
@@ -57,7 +57,7 @@ export default async function HotelPage({
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                 <span className="font-bold">{hotel.rating}</span>
-                <span>({hotel.reviews.length} reviews)</span>
+                {hotel.reviews?.length > 0 && <span>({hotel.reviews.length} reviews)</span>}
               </div>
             </div>
           </div>
@@ -73,6 +73,7 @@ export default async function HotelPage({
                       alt={`${hotel.name} gallery image ${index + 1}`}
                       fill
                       className="object-cover rounded-lg"
+                      data-ai-hint="hotel interior"
                     />
                   </div>
                 </CarouselItem>
@@ -113,38 +114,40 @@ export default async function HotelPage({
               </Card>
 
               {/* Reviews */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Guest Reviews</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {hotel.reviews.slice(0, 3).map((review, index) => (
-                    <div
-                      key={index}
-                      className="border-b pb-4 last:border-b-0"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-semibold">{review.author}</p>
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < review.rating
-                                  ? "text-yellow-400 fill-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
+              {hotel.reviews?.length > 0 && (
+                <Card>
+                    <CardHeader>
+                    <CardTitle>Guest Reviews</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                    {hotel.reviews.slice(0, 3).map((review, index) => (
+                        <div
+                        key={index}
+                        className="border-b pb-4 last:border-b-0"
+                        >
+                        <div className="flex justify-between items-center mb-2">
+                            <p className="font-semibold">{review.author}</p>
+                            <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                                <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                    i < review.rating
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                                />
+                            ))}
+                            </div>
                         </div>
-                      </div>
-                      <p className="text-muted-foreground italic">
-                        "{review.comment}"
-                      </p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                        <p className="text-muted-foreground italic">
+                            "{review.comment}"
+                        </p>
+                        </div>
+                    ))}
+                    </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Booking Card */}
@@ -159,24 +162,28 @@ export default async function HotelPage({
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Languages className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-semibold">Languages</p>
-                      <p className="text-sm text-muted-foreground">
-                        {hotel.spoken_languages?.join(", ")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ConciergeBell className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-semibold">Hotel Style</p>
-                      <p className="text-sm text-muted-foreground">
-                        {hotel.styles?.join(", ")}
-                      </p>
-                    </div>
-                  </div>
+                    {hotel.spoken_languages && hotel.spoken_languages.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <Languages className="w-5 h-5 text-primary" />
+                            <div>
+                            <p className="font-semibold">Languages</p>
+                            <p className="text-sm text-muted-foreground">
+                                {hotel.spoken_languages.join(", ")}
+                            </p>
+                            </div>
+                        </div>
+                    )}
+                    {hotel.styles && hotel.styles.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <ConciergeBell className="w-5 h-5 text-primary" />
+                            <div>
+                            <p className="font-semibold">Hotel Style</p>
+                            <p className="text-sm text-muted-foreground">
+                                {hotel.styles.join(", ")}
+                            </p>
+                            </div>
+                        </div>
+                    )}
                   <Button size="lg" className="w-full" asChild>
                     <Link
                       href={bookingLink}
