@@ -188,8 +188,8 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
                     Hotel Style
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {hotel.styles.map((style) => (
-                      <Badge key={style} variant="outline">{style}</Badge>
+                    {hotel.styles.map((style, index) => (
+                      <Badge key={`${style}-${index}`} variant="outline">{style}</Badge>
                     ))}
                   </div>
                 </div>
