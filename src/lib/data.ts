@@ -1,3 +1,4 @@
+
 import type { Hotel, Review } from "@/lib/types";
 
 const TRIPADVISOR_API_KEY = process.env.TRIPADVISOR_API_KEY;
@@ -36,7 +37,7 @@ async function getLocationDetails(locationId: string): Promise<any> {
 
     const details = await makeTripAdvisorRequest(`/location/${locationId}/details`, {
         language: "en",
-        currency: "BDT",
+        currency: "USD",
     });
 
     const photos = await makeTripAdvisorRequest(`/location/${locationId}/photos`, {
@@ -55,21 +56,21 @@ async function getLocationDetails(locationId: string): Promise<any> {
 }
 
 function parsePrice(priceLevel?: string): number {
-    if (!priceLevel) return 10000; // Default price
+    if (!priceLevel) return 50; // Default price
     
     const priceRange = priceLevel.split('-').map(p => parseInt(p.replace(/[^0-9]/g, ''), 10));
     
     if (priceRange.length > 1 && !isNaN(priceRange[0]) && !isNaN(priceRange[1])) {
-        // Return an average if it's a range like "BDT 5000 - BDT 10000"
+        // Return an average if it's a range like "$50 - $100"
         return (priceRange[0] + priceRange[1]) / 2;
     }
     
     if (priceRange.length === 1 && !isNaN(priceRange[0])) {
-        // Return the number if it's a single value like "BDT 5000"
+        // Return the number if it's a single value like "$50"
         return priceRange[0];
     }
     
-    return 10000; // Fallback default price
+    return 50; // Fallback default price
 }
 
 function transformHotelData(details: any): Hotel {

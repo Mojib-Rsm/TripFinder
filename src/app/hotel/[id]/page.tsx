@@ -125,9 +125,9 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
                 Best Price Guarantee
               </Badge>
               <Button asChild className="w-full">
-                <Link href={tripComUrl} target="_blank" rel="noopener noreferrer">
+                <Link href={hotel.web_url || '#'} target="_blank" rel="noopener noreferrer">
                   <Globe className="mr-2 h-4 w-4" />
-                  View on Trip.com
+                  View on TripAdvisor
                 </Link>
               </Button>
             </CardContent>
