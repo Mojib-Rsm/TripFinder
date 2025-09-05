@@ -1,3 +1,4 @@
+
 import { getHotelById, staticHotelsForParamGeneration } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -53,7 +54,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
     notFound();
   }
   
-  const tripComUrl = `https://www.trip.com/hotels/list?city=${encodeURIComponent(hotel.location)}&hotelname=${encodeURIComponent(hotel.name)}`;
+  const tripComUrl = `https://www.trip.com/hotels/list?city=${encodeURIComponent(hotel.location)}&hotelname=${encodeURIComponent(hotel.name)}&Allianceid=7039397&SID=256995544`;
 
   return (
     <div className="container mx-auto px-4 py-8">
