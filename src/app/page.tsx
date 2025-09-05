@@ -1,4 +1,4 @@
-import HotelSearchForm from "@/components/hotel-search-form";
+import TripSearchForm from "@/components/trip-search-form";
 import PersonalizedRecommendations from "@/components/personalized-recommendations";
 import Image from "next/image";
 
@@ -21,8 +21,8 @@ export default function Home() {
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
             Search deals on hotels, homes, and much more...
           </p>
-          <div className="max-w-4xl mx-auto backdrop-blur-sm bg-white/20 p-4 rounded-lg">
-            <HotelSearchForm />
+          <div className="max-w-4xl mx-auto">
+            <TripSearchForm />
           </div>
         </div>
       </section>
