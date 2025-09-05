@@ -1,4 +1,4 @@
-import { hotels } from "@/lib/data";
+import { getHotelsByLocation } from "@/lib/data";
 import { Hotel } from "@/lib/types";
 import HotelCard from "@/components/hotel-card";
 import AIRecommendations from "@/components/ai-recommendations";
@@ -10,11 +10,7 @@ export default async function SearchPage({
 }) {
   const location = (searchParams.location as string) || "";
 
-  const filteredHotels: Hotel[] = location
-    ? hotels.filter((hotel) =>
-        hotel.location.toLowerCase().includes(location.toLowerCase())
-      )
-    : hotels;
+  const filteredHotels: Hotel[] = await getHotelsByLocation(location);
 
   const searchCriteria = location
     ? `hotels in ${location}`
@@ -23,7 +19,7 @@ export default async function SearchPage({
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold font-headline mb-2">
-        {location ? `Hotels in ${location}` : "All Hotels"}
+        {location ? `Hotels in ${location}` : "Popular Hotels"}
       </h2>
       <p className="text-muted-foreground mb-8">
         {filteredHotels.length} hotel(s) found.

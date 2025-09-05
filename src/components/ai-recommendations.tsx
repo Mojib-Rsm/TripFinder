@@ -10,7 +10,6 @@ import {
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { hotels as allHotels } from "@/lib/data";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
 interface AIRecommendationsProps {
@@ -61,7 +60,7 @@ export default async function AIRecommendations({
   const recommendedHotels = recommendations.recommendations
     .slice(0, 3)
     .map((rec) => {
-      const hotel = allHotels.find((h) => h.name === rec.name);
+      const hotel = hotels.find((h) => h.name === rec.name);
       return { ...rec, hotel };
     })
     .filter((item) => item.hotel);

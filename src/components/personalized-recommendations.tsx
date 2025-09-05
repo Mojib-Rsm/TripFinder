@@ -6,7 +6,6 @@ import {
   personalizedHotelRecommendations,
   type PersonalizedHotelRecommendationsOutput,
 } from "@/ai/flows/personalized-hotel-recommendations";
-import { hotels } from "@/lib/data";
 import {
   Card,
   CardContent,
@@ -20,11 +19,14 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import Image from "next/image";
+import { Hotel } from "@/lib/types";
+
 
 const PersonalizedRecommendations = () => {
   const { history } = useSearchHistory();
   const [recommendations, setRecommendations] =
     useState<PersonalizedHotelRecommendationsOutput | null>(null);
+  const [hotels, setHotels] = useState<Hotel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,26 +36,35 @@ const PersonalizedRecommendations = () => {
         setIsLoading(true);
         setError(null);
         try {
-          const userHistoryForAI = history.map((h) => ({
-            location: h.location,
-            dates: `From: ${
-              h.dates.from?.toDateString() || "N/A"
-            } To: ${h.dates.to?.toDateString() || "N/A"}`,
-            preferences: "User is looking for highly rated hotels.",
-          }));
+          // Since we can't get all hotels from TripAdvisor easily,
+          // let's fetch a sample based on the user's most recent search.
+          const recentSearchLocation = history[0].location;
+          const response = await fetch(`/api/hotels?location=${recentSearchLocation}`);
+          const fetchedHotels: Hotel[] = await response.json();
+          setHotels(fetchedHotels);
 
-          const hotelDetailsForAI = hotels.map((h) => ({
-            hotelName: h.name,
-            hotelDescription: h.description,
-            rating: h.rating,
-            review: h.reviews[0]?.comment || "No reviews yet.",
-          }));
+          if (fetchedHotels.length > 0) {
+            const userHistoryForAI = history.map((h) => ({
+              location: h.location,
+              dates: `From: ${
+                h.dates.from?.toDateString() || "N/A"
+              } To: ${h.dates.to?.toDateString() || "N/A"}`,
+              preferences: "User is looking for highly rated hotels.",
+            }));
 
-          const result = await personalizedHotelRecommendations({
-            userHistory: userHistoryForAI,
-            hotelDetails: hotelDetailsForAI,
-          });
-          setRecommendations(result);
+            const hotelDetailsForAI = fetchedHotels.map((h) => ({
+              hotelName: h.name,
+              hotelDescription: h.description,
+              rating: h.rating,
+              review: h.reviews[0]?.comment || "No reviews yet.",
+            }));
+
+            const result = await personalizedHotelRecommendations({
+              userHistory: userHistoryForAI,
+              hotelDetails: hotelDetailsForAI,
+            });
+            setRecommendations(result);
+          }
         } catch (e) {
           console.error(e);
           setError("Could not fetch personalized recommendations.");

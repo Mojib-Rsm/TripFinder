@@ -1,4 +1,4 @@
-import { hotels } from "@/lib/data";
+import { getHotelById, staticHotelsForParamGeneration } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,13 +36,13 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 };
 
 export async function generateStaticParams() {
-  return hotels.map((hotel) => ({
+  return staticHotelsForParamGeneration.map((hotel) => ({
     id: hotel.id,
   }));
 }
 
 export default async function HotelPage({ params }: { params: { id: string } }) {
-  const hotel = hotels.find((h) => h.id === params.id);
+  const hotel = await getHotelById(params.id);
 
   if (!hotel) {
     notFound();
@@ -69,19 +69,33 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
         <div className="lg:col-span-2">
           <Carousel className="rounded-lg overflow-hidden shadow-lg">
             <CarouselContent>
-              {hotel.gallery.map((src, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative h-96">
-                    <Image
-                      src={src}
-                      alt={`${hotel.name} gallery image ${index + 1}`}
-                      data-ai-hint="hotel interior"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
+              {hotel.gallery && hotel.gallery.length > 0 ? (
+                hotel.gallery.map((src, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative h-96">
+                      <Image
+                        src={src}
+                        alt={`${hotel.name} gallery image ${index + 1}`}
+                        data-ai-hint="hotel interior"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))
+              ) : (
+                 <CarouselItem>
+                    <div className="relative h-96">
+                      <Image
+                        src="https://picsum.photos/800/600"
+                        alt="Placeholder image"
+                        data-ai-hint="hotel exterior"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+              )}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
@@ -138,7 +152,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
         <div className="lg:col-span-2">
           <h2 className="text-3xl font-bold font-headline mb-6">Reviews</h2>
           <div className="space-y-6">
-            {hotel.reviews.map((review, index) => (
+            {hotel.reviews.length > 0 ? hotel.reviews.map((review, index) => (
               <Card key={index} className="bg-card">
                 <CardHeader>
                   <div className="flex justify-between items-center">
@@ -161,7 +175,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
                   <p className="text-muted-foreground">{review.comment}</p>
                 </CardContent>
               </Card>
-            ))}
+            )) : <p>No reviews yet.</p>}
           </div>
         </div>
 
