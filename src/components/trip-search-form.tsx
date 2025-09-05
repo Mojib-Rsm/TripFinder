@@ -89,7 +89,11 @@ const TripSearchForm = () => {
                 </form>
             </Form>
         </TabsContent>
-        <TabsContent value="flights"><p className="text-center p-8">Flight search is coming soon!</p></TabsContent>
+        <TabsContent value="flights">
+            <div className="h-[400px] rounded-lg overflow-hidden">
+                 <iframe src="https://aviasales.tpx.lv/Z6SA7zjC" width="100%" height="100%" frameBorder="0" ></iframe>
+            </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
