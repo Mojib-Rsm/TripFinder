@@ -1,10 +1,10 @@
 import { getHotelsByLocation } from "@/lib/data";
 import { Hotel } from "@/lib/types";
-import HotelCard from "@/components/hotel-card";
 import AIRecommendations from "@/components/ai-recommendations";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, Star, Users, Dog, Wallet } from "lucide-react";
 import HotelSearchForm from "@/components/hotel-search-form";
+import HotelListItem from "@/components/hotel-list-item";
 
 export default async function SearchPage({
   searchParams,
@@ -58,9 +58,9 @@ export default async function SearchPage({
         )}
 
         {filteredHotels.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex flex-col gap-6">
             {filteredHotels.map((hotel) => (
-              <HotelCard key={hotel.id} hotel={hotel} />
+              <HotelListItem key={hotel.id} hotel={hotel} />
             ))}
           </div>
         ) : (

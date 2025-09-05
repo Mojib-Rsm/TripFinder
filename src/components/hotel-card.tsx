@@ -1,4 +1,5 @@
 
+
 import Image from "next/image";
 import Link from "next/link";
 import { Hotel } from "@/lib/types";
@@ -21,7 +22,7 @@ const HotelCard = ({ hotel }: HotelCardProps) => {
       <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card">
         <div className="relative h-48 w-full">
           <Image
-            src={hotel.gallery[0]}
+            src={hotel.gallery[0] || 'https://picsum.photos/400/300'}
             alt={hotel.name}
             data-ai-hint="hotel exterior"
             fill
@@ -43,7 +44,7 @@ const HotelCard = ({ hotel }: HotelCardProps) => {
         </CardContent>
         <CardFooter>
           <p className="text-lg font-semibold text-foreground">
-            ৳{hotel.price}
+            ${hotel.price}
             <span className="text-sm font-normal text-muted-foreground">
               {" "}
               / night

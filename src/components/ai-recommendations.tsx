@@ -11,6 +11,7 @@ import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import HotelListItem from "./hotel-list-item";
 
 interface AIRecommendationsProps {
   hotels: Hotel[];
@@ -71,23 +72,11 @@ export default async function AIRecommendations({
         <Sparkles className="w-6 h-6 text-primary" />
         <h3 className="text-2xl font-bold font-headline">Top AI Picks For You</h3>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-4">
         {recommendedHotels.map(
           ({ hotel, reason }) =>
             hotel && (
-              <Card key={hotel.id} className="bg-card shadow-md">
-                <CardHeader>
-                  <CardTitle>{hotel.name}</CardTitle>
-                  <CardDescription className="!mt-2 pt-2 border-t">
-                    {reason}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button asChild variant="secondary" className="w-full">
-                    <Link href={`/hotel/${hotel.id}`}>View Details</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+              <HotelListItem key={hotel.id} hotel={hotel} reason={reason} />
             )
         )}
       </div>
