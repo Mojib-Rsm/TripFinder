@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function FlightCard({ flight }: { flight: Flight }) {
   const partnerId = process.env.AVIASALES_PARTNER_ID;
-  const flightLink = `https://www.aviasales.com/search/${flight.origin}${format(new Date(flight.departure_at), 'ddMM')}${flight.destination}${flight.return_at ? format(new Date(flight.return_at), 'ddMM') : ''}1?marker=${partnerId}`;
+  const flightLink = `https://www.aviasales.com${flight.link}&marker=${partnerId}`;
 
   return (
     <Card className="transition-all hover:shadow-lg">
@@ -29,12 +29,15 @@ function FlightCard({ flight }: { flight: Flight }) {
         <div className="flex justify-between items-center text-sm text-muted-foreground mb-4">
           <div className="flex flex-col items-start">
             <span className="font-bold text-xl text-foreground">{flight.origin}</span>
-            <span>{flight.origin_airport}</span>
+            <span className="text-xs">{flight.origin_airport}</span>
           </div>
-          <ArrowRight className="w-5 h-5"/>
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center">
+             <ArrowRight className="w-5 h-5"/>
+             <span className="text-xs mt-1">{flight.transfers} {flight.transfers === 1 ? 'stop' : 'stops'}</span>
+          </div>
+          <div className="flex flex-col items-end text-right">
             <span className="font-bold text-xl text-foreground">{flight.destination}</span>
-            <span>{flight.destination_airport}</span>
+            <span className="text-xs">{flight.destination_airport}</span>
           </div>
         </div>
         <div className="flex justify-between items-center text-sm border-t pt-4">
@@ -107,6 +110,9 @@ export default async function FlightsPage({ searchParams }: { searchParams: { [k
             <p className="text-muted-foreground mt-2">
               We couldn't find any flights for the selected criteria. Try a different search.
             </p>
+             <Button asChild className="mt-4">
+                <Link href="/">Go back to search</Link>
+            </Button>
           </div>
         )}
       </div>

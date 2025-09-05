@@ -198,20 +198,27 @@ export async function getFlights(params: {
         return [];
     }
 
-    const flights: Flight[] = data.data.map((flight: any) => ({
-      id: `${flight.origin}-${flight.destination}-${flight.flight_number}-${flight.departure_at}`,
-      origin: flight.origin,
-      destination: flight.destination,
-      origin_airport: flight.origin_airport,
-      destination_airport: flight.destination_airport,
-      price: flight.price,
-      airline: flight.airline,
-      flight_number: flight.flight_number,
-      departure_at: flight.departure_at,
-      return_at: flight.return_at,
-      transfers: flight.transfers,
-      duration: flight.duration,
-      link: flight.link,
+    const flights: Flight[] = await Promise.all(data.data.map(async (flight: any) => {
+        const [originAirport, destinationAirport] = await Promise.all([
+            getAirportName(flight.origin_airport),
+            getAirportName(flight.destination_airport)
+        ]);
+        
+        return {
+          id: `${flight.origin}-${flight.destination}-${flight.flight_number}-${flight.departure_at}`,
+          origin: flight.origin,
+          destination: flight.destination,
+          origin_airport: originAirport,
+          destination_airport: destinationAirport,
+          price: flight.price,
+          airline: flight.airline,
+          flight_number: flight.flight_number,
+          departure_at: flight.departure_at,
+          return_at: flight.return_at,
+          transfers: flight.transfers,
+          duration: flight.duration,
+          link: flight.link,
+        }
     }));
     
     return flights;
@@ -219,4 +226,28 @@ export async function getFlights(params: {
     console.error('Error in getFlights:', error);
     throw new Error('Error fetching flights');
   }
+}
+
+// Caching airport data to avoid repeated API calls
+const airportDataCache = new Map<string, string>();
+
+async function getAirportName(iataCode: string): Promise<string> {
+    if (airportDataCache.has(iataCode)) {
+        return airportDataCache.get(iataCode) as string;
+    }
+
+    try {
+        const response = await fetch(`https://api.travelpayouts.com/data/en/airports.json`);
+        if (!response.ok) return iataCode; // Fallback to IATA code
+        
+        const airports = await response.json();
+        const airport = airports.find((a: any) => a.code === iataCode);
+        const airportName = airport ? `${airport.name} (${iataCode})` : iataCode;
+        
+        airportDataCache.set(iataCode, airportName);
+        return airportName;
+    } catch (error) {
+        console.error(`Could not fetch airport name for ${iataCode}:`, error);
+        return iataCode; // Fallback to IATA code on error
+    }
 }
