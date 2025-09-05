@@ -19,4 +19,6 @@ export interface Hotel {
   reviews: Review[];
   gallery: string[];
   web_url?: string;
+  styles?: string[];
+  spoken_languages?: string[];
 }

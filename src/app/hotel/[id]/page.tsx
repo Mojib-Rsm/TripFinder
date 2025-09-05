@@ -23,6 +23,8 @@ import {
   Tv,
   Check,
   Globe,
+  Building,
+  Languages,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -154,6 +156,56 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
               ))}
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Good to know</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <div className="space-y-2">
+                <h4 className="font-semibold flex items-center gap-2 text-muted-foreground">
+                  <Star className="w-5 h-5" />
+                  Hotel Class
+                </h4>
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < Math.round(hotel.rating)
+                          ? "text-yellow-500 fill-yellow-500"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                   <span className="ml-2 text-sm">({hotel.rating.toFixed(1)})</span>
+                </div>
+              </div>
+               {hotel.styles && hotel.styles.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2 text-muted-foreground">
+                    <Building className="w-5 h-5" />
+                    Hotel Style
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {hotel.styles.map((style) => (
+                      <Badge key={style} variant="outline">{style}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {hotel.spoken_languages && hotel.spoken_languages.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2 text-muted-foreground">
+                    <Languages className="w-5 h-5" />
+                    Languages Spoken
+                  </h4>
+                  <p>{hotel.spoken_languages.join(', ')}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
         </div>
       </div>
 

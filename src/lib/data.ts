@@ -94,6 +94,8 @@ function transformHotelData(details: any): Hotel {
         })) || [],
         gallery: details.photos?.map((photo: any) => photo.images.large.url) || ['https://picsum.photos/800/600'],
         web_url: details.web_url,
+        styles: details.styles?.map((style: any) => style.name),
+        spoken_languages: details.spoken_languages?.map((lang: any) => lang.name),
     };
 }
 
