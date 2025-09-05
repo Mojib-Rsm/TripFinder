@@ -9,7 +9,7 @@ const Header = () => {
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">
-              Trip.com
+              TripFinder
             </h1>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
