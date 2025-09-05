@@ -6,7 +6,6 @@ import { findNearbyAirportsFlow } from '@/ai/flows/nearby-airport-tool';
 const AVIASALES_API_KEY = process.env.AVIASALES_API_KEY;
 const AVIASALES_PARTNER_ID = process.env.AVIASALES_PARTNER_ID;
 const TRIPADVISOR_BASE_URL = 'https://api.content.tripadvisor.com/api/v1';
-const AVIASALES_API_URL = 'https://api.travelpayouts.com/v2/prices/latest';
 
 // A module-level cache to avoid re-fetching the same data multiple times across requests.
 const locationCache = new Map<string, any>();
@@ -61,6 +60,7 @@ async function makeTripAdvisorRequest(
       }, 500);
     });
 }
+
 
 async function getLocationDetails(locationId: string): Promise<any> {
   if (locationCache.has(locationId)) {
@@ -213,6 +213,100 @@ export const staticHotelsForParamGeneration = [
 ];
 
 // Flights
+async function startFlightSearch(params: {
+  origin: string;
+  destination: string;
+  depart_date: string;
+  return_date?: string;
+}) {
+  if (!AVIASALES_API_KEY) {
+    throw new Error('Aviasales API key is not configured');
+  }
+
+  const response = await fetch('https://api.travelpayouts.com/v1/flight_search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': AVIASALES_API_KEY,
+    },
+    body: JSON.stringify({
+      marker: AVIASALES_PARTNER_ID,
+      passengers: {
+        adults: 1,
+        children: 0,
+        infants: 0,
+      },
+      segments: [
+        {
+          origin: params.origin,
+          destination: params.destination,
+          date: params.depart_date,
+        },
+        ...(params.return_date
+          ? [
+              {
+                origin: params.destination,
+                destination: params.origin,
+                date: params.return_date,
+              },
+            ]
+          : []),
+      ],
+      trip_class: 'Y', // Y: Economy, C: Business, F: First
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Aviasales flight search initiation error:', errorText);
+    throw new Error('Failed to start flight search.');
+  }
+
+  const result = await response.json();
+  return result.search_id;
+}
+
+
+async function getFlightSearchResults(searchId: string): Promise<Flight[]> {
+  const response = await fetch(
+    `https://api.travelpayouts.com/v1/flight_search_results?uuid=${searchId}`
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Aviasales flight search results error:', errorText);
+    throw new Error('Failed to fetch flight search results.');
+  }
+
+  const data = await response.json();
+
+  if (!data.proposals || data.proposals.length === 0) {
+    return [];
+  }
+
+  const flights: Flight[] = data.proposals.map((flightData: any) => {
+    return {
+      id: flightData.proposal_id,
+      origin: flightData.segments[0].origin,
+      destination: flightData.segments[0].destination,
+      price: flightData.price.amount,
+      airline: flightData.validating_carrier, // This might need mapping to a name
+      departure_at: flightData.segments[0].departure,
+      return_at: flightData.segments[1]?.departure,
+      link: flightData.deeplink_url,
+      // The new API doesn't directly provide all the same fields as the old one.
+      // We will have to adapt or omit them.
+      origin_airport: flightData.segments[0].origin,
+      destination_airport: flightData.segments[0].destination,
+      flight_number: flightData.segments[0].flight_number,
+      transfers: flightData.segments.reduce((acc: number, curr: any) => acc + (curr.stops || 0), -1),
+      duration: 0, // Not provided directly
+    };
+  });
+  
+  return flights;
+}
+
 export async function getFlights(params: {
   origin: string;
   destination: string;
@@ -223,31 +317,23 @@ export async function getFlights(params: {
   alternativeOrigin?: any;
   alternativeDestination?: any;
 }> {
-  if (!AVIASALES_API_KEY) {
-    throw new Error('Aviasales API key is not configured');
-  }
-
-  const apiParams: Record<string, string> = {
-    ...params,
-    token: AVIASALES_API_KEY,
-    currency: 'usd',
-    limit: '20',
-  };
-
   try {
-    const response = await fetch(
-      `${AVIASALES_API_URL}?${new URLSearchParams(apiParams)}`
-    );
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Aviasales API error:', errorText);
-      throw new Error(`Error from Aviasales API: ${response.statusText}`);
+    const searchId = await startFlightSearch(params);
+    let flights: Flight[] = [];
+    let attempts = 0;
+    
+    // Poll for results
+    while (flights.length === 0 && attempts < 5) {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
+      const results = await getFlightSearchResults(searchId);
+      if (results.length > 0) {
+          flights = results;
+          break;
+      }
+      attempts++;
     }
 
-    const data = await response.json();
-
-    if (!data.success || !data.data || data.data.length === 0) {
-      // If no flights, check for nearby airports
+    if (flights.length === 0) {
       const [alternativeOrigin, alternativeDestination] = await Promise.all([
         findNearbyAirportsFlow({ airportCode: params.origin }),
         findNearbyAirportsFlow({ airportCode: params.destination }),
@@ -255,35 +341,27 @@ export async function getFlights(params: {
       return { flights: [], alternativeOrigin, alternativeDestination };
     }
 
-    const flights: Flight[] = await Promise.all(
-      data.data.map(async (flight: any) => {
+    // Add full airport names
+    const flightsWithAirportNames = await Promise.all(
+        flights.map(async (flight) => {
         const [originAirport, destinationAirport] = await Promise.all([
-          getAirportName(flight.origin_airport),
-          getAirportName(flight.destination_airport),
+            getAirportName(flight.origin),
+            getAirportName(flight.destination),
         ]);
-
         return {
-          id: `${flight.origin}-${flight.destination}-${flight.flight_number}-${flight.departure_at}`,
-          origin: flight.origin,
-          destination: flight.destination,
-          origin_airport: originAirport,
-          destination_airport: destinationAirport,
-          price: flight.price,
-          airline: flight.airline,
-          flight_number: flight.flight_number,
-          departure_at: flight.departure_at,
-          return_at: flight.return_at,
-          transfers: flight.transfers,
-          duration: flight.duration,
-          link: flight.link,
+            ...flight,
+            origin_airport: originAirport,
+            destination_airport: destinationAirport,
         };
-      })
+        })
     );
 
-    return { flights };
+
+    return { flights: flightsWithAirportNames };
   } catch (error) {
     console.error('Error in getFlights:', error);
-    throw new Error('Error fetching flights');
+    // Return empty results and no alternatives on a hard error
+    return { flights: [] };
   }
 }
 

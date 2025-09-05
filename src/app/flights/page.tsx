@@ -1,3 +1,4 @@
+
 // src/app/flights/page.tsx
 import { getFlights } from '@/lib/data';
 import { Flight } from '@/lib/types';
@@ -13,8 +14,7 @@ import {
 } from '@/components/ui/card';
 
 function FlightCard({ flight }: { flight: Flight }) {
-  const partnerId = process.env.AVIASALES_PARTNER_ID;
-  const flightLink = `https://www.aviasales.com${flight.link}&marker=${partnerId}`;
+  const flightLink = flight.link; // The deeplink_url is a full URL
 
   return (
     <Card className="transition-all hover:shadow-lg">
