@@ -94,7 +94,7 @@ export async function getHotelsByLocation(searchQuery: string): Promise<Hotel[]>
     const hotelSummaries = searchResults.data;
 
     const hotels = await Promise.all(
-        hotelSummaries.slice(0, 12).map(async (summary: any) => {
+        hotelSummaries.slice(0, 8).map(async (summary: any) => {
             try {
                 const details = await getLocationDetails(summary.location_id);
                 return transformHotelData(details);
