@@ -18,11 +18,10 @@ const Header = () => {
         </div>
         <nav className="hidden md:flex items-center gap-2">
             <Button asChild variant="ghost"><Link href="/">Home</Link></Button>
-            <Button asChild variant="ghost"><Link href="/search">Hotels</Link></Button>
-            <Button asChild variant="ghost"><Link href="/search">Flights</Link></Button>
-            <Button asChild variant="ghost"><Link href="/search">Tours</Link></Button>
-            <Button asChild variant="ghost"><Link href="/search">Blog</Link></Button>
-            <Button asChild variant="ghost"><Link href="/search">Contact</Link></Button>
+            <Button asChild variant="ghost"><Link href="/flights">Flights</Link></Button>
+            <Button asChild variant="ghost"><Link href="/">Tours</Link></Button>
+            <Button asChild variant="ghost"><Link href="/">Blog</Link></Button>
+            <Button asChild variant="ghost"><Link href="/">Contact</Link></Button>
         </nav>
         <div className="hidden md:flex items-center gap-4">
             <Button variant="outline">List Your Property</Button>
