@@ -22,7 +22,7 @@ const HotelRecommendationInputSchema = z.object({
       price: z.number().describe('The price of the hotel per night'),
     })
   ).describe('An array of hotel details, including name, rating, reviews, location and price.'),
-  searchCriteria: z.string().describe('The user\u2019s search criteria, such as \"hotels near the beach with free breakfast\"'),
+  searchCriteria: z.string().describe('The user’s search criteria, such as \"hotels near the beach with free breakfast\"'),
 });
 
 export type HotelRecommendationInput = z.infer<typeof HotelRecommendationInputSchema>;
@@ -59,9 +59,10 @@ Here are the hotels:
     Price: {{this.price}}
 {{/each}}
 
-Provide the top three hotel recommendations, with a reason for each recommendation. Be concise.
+Provide the top three hotel recommendations, with a reason for each recommendation. Be concise. If no hotels are a good match, you can select the top 3 highest-rated hotels and state that you couldn't find a perfect match for the criteria.
 
-Output in the following JSON format:
+Your response must be a valid JSON object that conforms to the following schema.
+Output Schema: {{{outputSchema}}}
 `,
 });
 
@@ -73,6 +74,9 @@ const hotelRecommendationFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+        throw new Error("The AI model did not return a valid recommendation.");
+    }
+    return output;
   }
 );
