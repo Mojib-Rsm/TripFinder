@@ -56,6 +56,9 @@ const TripSearchForm = () => {
 
   const hotelForm = useForm<z.infer<typeof hotelFormSchema>>({
     resolver: zodResolver(hotelFormSchema),
+    defaultValues: {
+      location: "",
+    },
   });
 
   function onFlightSubmit(values: z.infer<typeof flightFormSchema>) {
