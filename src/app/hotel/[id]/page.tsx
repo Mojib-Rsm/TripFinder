@@ -116,7 +116,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold mb-4">
-                ${hotel.price}{" "}
+                ৳{hotel.price}{" "}
                 <span className="text-base font-normal text-muted-foreground">
                   / night
                 </span>
@@ -125,9 +125,9 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
                 Best Price Guarantee
               </Badge>
               <Button asChild className="w-full">
-                <Link href={hotel.web_url || '#'} target="_blank" rel="noopener noreferrer">
+                <Link href={tripComUrl} target="_blank" rel="noopener noreferrer">
                   <Globe className="mr-2 h-4 w-4" />
-                  View on TripAdvisor
+                  View on Trip.com
                 </Link>
               </Button>
             </CardContent>

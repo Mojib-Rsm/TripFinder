@@ -15,6 +15,7 @@ async function makeTripAdvisorRequest(endpoint: string, params: Record<string, s
   const url = new URL(`${BASE_URL}${endpoint}`);
   url.search = new URLSearchParams(params).toString();
   url.searchParams.set("key", TRIPADVISOR_API_KEY);
+  url.searchParams.set("currency", "BDT");
 
   const response = await fetch(url.toString(), {
     headers: {
@@ -37,7 +38,6 @@ async function getLocationDetails(locationId: string): Promise<any> {
 
     const details = await makeTripAdvisorRequest(`/location/${locationId}/details`, {
         language: "en",
-        currency: "USD",
     });
 
     const photos = await makeTripAdvisorRequest(`/location/${locationId}/photos`, {
@@ -56,21 +56,22 @@ async function getLocationDetails(locationId: string): Promise<any> {
 }
 
 function parsePrice(priceLevel?: string): number {
-    if (!priceLevel) return 50; // Default price
+    if (!priceLevel) return 5000; // Default price
     
-    const priceRange = priceLevel.split('-').map(p => parseInt(p.replace(/[^0-9]/g, ''), 10));
+    // Example price level for BDT might be "৳5,000-৳10,000"
+    const priceRange = priceLevel.replace(/[^0-9-]/g, '').split('-').map(p => parseInt(p, 10));
     
     if (priceRange.length > 1 && !isNaN(priceRange[0]) && !isNaN(priceRange[1])) {
-        // Return an average if it's a range like "$50 - $100"
+        // Return an average if it's a range
         return (priceRange[0] + priceRange[1]) / 2;
     }
     
     if (priceRange.length === 1 && !isNaN(priceRange[0])) {
-        // Return the number if it's a single value like "$50"
+        // Return the number if it's a single value
         return priceRange[0];
     }
     
-    return 50; // Fallback default price
+    return 5000; // Fallback default price
 }
 
 function transformHotelData(details: any): Hotel {
@@ -95,7 +96,7 @@ function transformHotelData(details: any): Hotel {
         })) || [],
         gallery: details.photos?.map((photo: any) => photo.images.large.url) || ['https://picsum.photos/800/600'],
         web_url: details.web_url,
-        styles: details.styles?.map((style: any) => style.name),
+        styles: details.hotel_class?.split(',').map((s: string) => s.trim()) || details.styles?.map((style: any) => style.name),
         spoken_languages: details.spoken_languages?.map((lang: any) => lang.name),
     };
 }

@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { CircleUserRound, MoreHorizontal } from "lucide-react";
+import { CircleUserRound, Ellipsis } from "lucide-react";
 
 const Header = () => {
   return (
@@ -10,7 +10,7 @@ const Header = () => {
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">
-              TripFinder
+              Trip.com
             </h1>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
@@ -20,13 +20,13 @@ const Header = () => {
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Car Services</Button>
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Attractions & Tours</Button>
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
-              <MoreHorizontal />
+              <Ellipsis />
             </Button>
           </nav>
         </div>
         <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">List Your Property</Button>
-            <span className="text-sm">USD</span>
+            <span className="text-sm">BDT</span>
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Customer Support</Button>
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
               <CircleUserRound className="w-6 h-6"/>
