@@ -1,8 +1,40 @@
+
 import TripSearchForm from "@/components/trip-search-form";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import PersonalizedRecommendations from "@/components/personalized-recommendations";
+import { getHotelsByLocation } from "@/lib/data";
+import HotelCard from "@/components/hotel-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
-export default function Home() {
+const popularDestinations = [
+  {
+    name: "Europe",
+    img: "https://picsum.photos/300/400?random=1",
+    aiHint: "paris eiffel tower",
+  },
+  {
+    name: "United Kingdom",
+    img: "https://picsum.photos/300/400?random=2",
+    aiHint: "london big ben",
+  },
+  {
+    name: "Thailand",
+    img: "https://picsum.photos/300/400?random=3",
+    aiHint: "thailand beach",
+  },
+  {
+    name: "Indonesia",
+    img: "https://picsum.photos/300/400?random=4",
+aiHint: "indonesia temple"
+  },
+];
+
+export default async function Home() {
+
+  const popularHotels = await getHotelsByLocation("Cox's Bazar");
   return (
     <>
       <section className="relative h-[65vh] min-h-[500px] flex items-center justify-center text-center text-white">
@@ -59,6 +91,45 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      <PersonalizedRecommendations />
+
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <h3 className="text-3xl font-bold font-headline mb-8">More places to stay in Cox's Bazar</h3>
+           {popularHotels.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {popularHotels.slice(0, 4).map((hotel) => (
+                <HotelCard key={hotel.id} hotel={hotel} />
+              ))}
+            </div>
+          ) : (
+            <p>Could not load popular hotels at this time.</p>
+          )}
+        </div>
+      </section>
+      
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h3 className="text-3xl font-bold font-headline mb-8">Inspiration for your next trip</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {popularDestinations.map(dest => (
+              <Link href={`/search?location=${dest.name}`} key={dest.name}>
+                <Card className="overflow-hidden group">
+                  <div className="relative h-72">
+                    <Image src={dest.img} alt={dest.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" data-ai-hint={dest.aiHint}/>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                  <CardContent className="p-4 absolute bottom-0">
+                    <h4 className="text-xl font-bold text-white">{dest.name}</h4>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+      
     </>
   );
 }
