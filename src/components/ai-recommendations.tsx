@@ -5,11 +5,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Sparkles, Star } from "lucide-react";
+import { getPersonalizedHotelRecommendations } from "@/ai/flows/personalized-hotel-recommendations";
 import {
-  PersonalizedHotelRecommendationsInput,
-  PersonalizedHotelRecommendationsOutput,
-  personalizedHotelRecommendationsFlow,
-} from "@/ai/flows/personalized-hotel-recommendations";
+    type PersonalizedHotelRecommendationsInput,
+    type PersonalizedHotelRecommendationsOutput
+} from "@/ai/flows/personalized-hotel-recommendations-types";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 
@@ -32,7 +32,7 @@ export default function AiRecommendations({ location }: { location: string }) {
     };
 
     try {
-      const result = await personalizedHotelRecommendationsFlow(input);
+      const result = await getPersonalizedHotelRecommendations(input);
       setRecommendations(result);
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching recommendations.");
