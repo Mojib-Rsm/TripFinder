@@ -22,7 +22,10 @@ import {
   Waves,
   Tv,
   Check,
+  Globe,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   "Wi-Fi": <Wifi className="w-5 h-5" />,
@@ -113,9 +116,17 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
                   / night
                 </span>
               </p>
-              <Badge className="bg-accent text-accent-foreground text-lg py-1 px-4">
+              <Badge className="bg-green-100 text-green-800 text-lg py-1 px-4 mb-4">
                 Best Price Guarantee
               </Badge>
+              {hotel.web_url && (
+                <Button asChild className="w-full">
+                  <Link href={hotel.web_url} target="_blank" rel="noopener noreferrer">
+                    <Globe className="mr-2 h-4 w-4" />
+                    View on TripAdvisor
+                  </Link>
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>

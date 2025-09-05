@@ -75,6 +75,7 @@ function transformHotelData(details: any): Hotel {
             comment: review.text,
         })) || [],
         gallery: details.photos?.map((photo: any) => photo.images.large.url) || ['https://picsum.photos/800/600'],
+        web_url: details.web_url,
     };
 }
 

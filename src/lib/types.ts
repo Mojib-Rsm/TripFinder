@@ -18,4 +18,5 @@ export interface Hotel {
   amenities: Amenity[];
   reviews: Review[];
   gallery: string[];
+  web_url?: string;
 }
