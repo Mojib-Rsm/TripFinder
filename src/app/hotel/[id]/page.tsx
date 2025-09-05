@@ -155,7 +155,7 @@ export default async function HotelPage({
               <Card className="sticky top-24">
                 <CardHeader>
                   <p className="text-2xl font-bold">
-                    ${hotel.price}{" "}
+                    BDT {hotel.price}{" "}
                     <span className="text-base font-normal text-muted-foreground">
                       / night
                     </span>

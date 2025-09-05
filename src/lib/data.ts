@@ -35,7 +35,7 @@ async function makeTripAdvisorRequest(endpoint: string, params: URLSearchParams)
 async function getLocationDetails(locationId: string) {
   const params = new URLSearchParams({
     language: 'en',
-    currency: 'USD',
+    currency: 'BDT',
   });
   return makeTripAdvisorRequest(`/location/${locationId}/details`, params);
 }
@@ -80,7 +80,7 @@ const mockHotels: Hotel[] = [
     name: 'Seaside Resort & Spa',
     description: 'A luxurious resort offering stunning ocean views, a world-class spa, and gourmet dining options. Perfect for a relaxing getaway.',
     location: "Cox's Bazar",
-    price: 250,
+    price: 25000,
     rating: 4.8,
     amenities: mockAmenities,
     reviews: mockReviews,
@@ -99,7 +99,7 @@ const mockHotels: Hotel[] = [
     name: 'The Grand City Hotel',
     description: 'Located in the heart of the city, this hotel offers modern amenities and easy access to major attractions and business districts.',
     location: 'Dhaka',
-    price: 180,
+    price: 18000,
     rating: 4.5,
     amenities: mockAmenities,
     reviews: mockReviews,
@@ -116,7 +116,7 @@ const mockHotels: Hotel[] = [
     name: 'Bangkok Oasis Suites',
     description: 'An urban oasis with spacious suites, a rooftop pool, and vibrant nightlife just steps away.',
     location: 'Bangkok',
-    price: 150,
+    price: 15000,
     rating: 4.6,
     amenities: mockAmenities,
     reviews: mockReviews,
@@ -133,7 +133,7 @@ const mockHotels: Hotel[] = [
     name: 'Dubai Skyscraper Views',
     description: 'Experience unparalleled luxury with breathtaking views of the Dubai skyline from every room.',
     location: 'Dubai',
-    price: 450,
+    price: 45000,
     rating: 4.9,
     amenities: mockAmenities,
     reviews: mockReviews,
@@ -159,8 +159,7 @@ export async function getHotelsByLocation(
     });
     const searchResults = await makeTripAdvisorRequest('/location/search', searchParams);
     
-    if (!searchResults || !searchResults.data) {
-      // Fallback to mock data if API fails or returns no data
+    if (!searchResults || !searchResults.data || searchResults.data.length === 0) {
       console.warn('API returned no data, falling back to mock hotels.');
       return mockHotels.filter(h => h.location.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -169,13 +168,12 @@ export async function getHotelsByLocation(
       id: hotel.location_id,
       name: hotel.name || 'Hotel Name Unavailable',
       location: hotel.address_obj?.address_string || 'Location Unavailable',
-      // The search result does not contain all details, so we use placeholders.
       description: 'Click to see more details about this hotel.',
-      price: Math.floor(Math.random() * 300) + 50, // Placeholder price
-      rating: (Math.random() * 1.5 + 3.5), // Placeholder rating between 3.5 and 5.0
+      price: Math.floor(Math.random() * 20000) + 5000,
+      rating: (Math.random() * 1.5 + 3.5),
       amenities: [],
       reviews: [],
-      gallery: [`https://media-cdn.tripadvisor.com/media/photo-s/29/18/88/68/exterior.jpg`],
+      gallery: hotel.photo?.images?.large?.url ? [hotel.photo.images.large.url] : ['https://picsum.photos/400/300'],
     }));
 
     return hotels;
@@ -205,7 +203,7 @@ export async function getHotelById(hotelId: string): Promise<Hotel | null> {
         name: details.name || 'No name',
         description: details.description || 'No description available.',
         location: details.address_obj?.address_string || 'Unknown location',
-        price: parseInt(details.price_level?.replace(/[^0-9]/g, ''), 10) * 100 || 150,
+        price: details.price_level ? parseInt(details.price_level.replace(/[^0-9]/g, '')) * 100 : 15000,
         rating: details.rating || 0,
         amenities: details.amenities?.map((a: any) => ({ name: a.name })) || [],
         reviews: reviews?.data?.map((r: any) => ({
@@ -225,8 +223,6 @@ export async function getHotelById(hotelId: string): Promise<Hotel | null> {
     }
 }
 
-// The following functions are to support generateStaticParams, which requires a non-dynamic data source.
-// We'll keep a small, static list for this purpose.
 export const staticHotelsForParamGeneration = mockHotels.map(h => ({id: h.id}));
 
 // Flights
@@ -311,8 +307,6 @@ async function getFlightSearchResults(searchId: string): Promise<Flight[]> {
       departure_at: flightData.segments[0].departure,
       return_at: flightData.segments[1]?.departure,
       link: flightData.deeplink_url,
-      // The new API doesn't directly provide all the same fields as the old one.
-      // We will have to adapt or omit them.
       origin_airport: flightData.segments[0].origin,
       destination_airport: flightData.segments[0].destination,
       flight_number: flightData.segments[0].flight_number,
@@ -377,12 +371,10 @@ export async function getFlights(params: {
     return { flights: flightsWithAirportNames };
   } catch (error) {
     console.error('Error in getFlights:', error);
-    // Return empty results and no alternatives on a hard error
     return { flights: [] };
   }
 }
 
-// Caching airport data to avoid repeated API calls
 const airportDataCache = new Map<string, string>();
 
 async function getAirportName(iataCode: string): Promise<string> {
@@ -394,7 +386,7 @@ async function getAirportName(iataCode: string): Promise<string> {
     const response = await fetch(
       `https://api.travelpayouts.com/data/en/airports.json`
     );
-    if (!response.ok) return iataCode; // Fallback to IATA code
+    if (!response.ok) return iataCode;
 
     const airports = await response.json();
     const airport = airports.find((a: any) => a.code === iataCode);
@@ -404,6 +396,6 @@ async function getAirportName(iataCode: string): Promise<string> {
     return airportName;
   } catch (error) {
     console.error(`Could not fetch airport name for ${iataCode}:`, error);
-    return iataCode; // Fallback to IATA code on error
+    return iataCode;
   }
 }

@@ -50,7 +50,7 @@ export default function HotelCard({ hotel }: HotelCardProps) {
       </Link>
       <CardFooter className="flex items-center justify-between">
          <p className="text-lg font-semibold text-foreground">
-            ${hotel.price}
+            BDT {hotel.price}
             <span className="text-sm font-normal text-muted-foreground"> / night</span>
         </p>
         <Button asChild>

@@ -88,7 +88,7 @@ export default function AiRecommendations({ location }: { location: string }) {
                   <CardContent className="p-4">
                     <h3 className="font-bold">{hotel.name}</h3>
                     <div className="flex items-center justify-between text-sm mt-2">
-                       <Badge variant="secondary">${hotel.price}/night</Badge>
+                       <Badge variant="secondary">BDT {hotel.price}/night</Badge>
                        <div className="flex items-center gap-1">
                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                          <span className="font-medium">{hotel.rating}</span>
