@@ -75,7 +75,7 @@ export default function AirportInput({ value, onChange, placeholder }: AirportIn
         <div className="relative" ref={containerRef}>
             <Input
                 placeholder={placeholder}
-                value={query}
+                value={query || ''}
                 onChange={handleInputChange}
                 onFocus={() => setShowSuggestions(true)}
                 className="h-14 text-base bg-gray-100 uppercase"
@@ -106,7 +106,7 @@ export default function AirportInput({ value, onChange, placeholder }: AirportIn
                             ))}
                         </ul>
                     )}
-                    {!isLoading && debouncedQuery.length > 1 && suggestions.length === 0 && (
+                    {!isLoading && (debouncedQuery || '').length > 1 && suggestions.length === 0 && (
                         <div className="p-4 text-sm text-center text-muted-foreground">No airports found.</div>
                     )}
                 </div>
