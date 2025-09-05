@@ -36,7 +36,7 @@ async function getLocationDetails(locationId: string): Promise<any> {
 
     const details = await makeTripAdvisorRequest(`/location/${locationId}/details`, {
         language: "en",
-        currency: "USD",
+        currency: "BDT",
     });
 
     const photos = await makeTripAdvisorRequest(`/location/${locationId}/photos`, {
@@ -55,21 +55,21 @@ async function getLocationDetails(locationId: string): Promise<any> {
 }
 
 function parsePrice(priceLevel?: string): number {
-    if (!priceLevel) return 150; // Default price
+    if (!priceLevel) return 15000; // Default price
     
     const priceRange = priceLevel.split('-').map(p => parseInt(p.replace(/[^0-9]/g, ''), 10));
     
     if (priceRange.length > 1 && !isNaN(priceRange[0]) && !isNaN(priceRange[1])) {
-        // Return an average if it's a range like "$150 - $250"
+        // Return an average if it's a range like "৳15000 - ৳25000"
         return (priceRange[0] + priceRange[1]) / 2;
     }
     
     if (priceRange.length === 1 && !isNaN(priceRange[0])) {
-        // Return the number if it's a single value like "$150"
+        // Return the number if it's a single value like "৳15000"
         return priceRange[0];
     }
     
-    return 150; // Fallback default price
+    return 15000; // Fallback default price
 }
 
 function transformHotelData(details: any): Hotel {
