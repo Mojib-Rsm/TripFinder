@@ -3,6 +3,9 @@ import type { Hotel, Review } from "@/lib/types";
 const TRIPADVISOR_API_KEY = process.env.TRIPADVISOR_API_KEY;
 const BASE_URL = "https://api.content.tripadvisor.com/api/v1";
 
+// A module-level cache to avoid re-fetching the same data multiple times across requests.
+const locationCache = new Map<string, any>();
+
 async function makeTripAdvisorRequest(endpoint: string, params: Record<string, string>) {
   if (!TRIPADVISOR_API_KEY) {
     throw new Error("TripAdvisor API key not configured");
@@ -25,9 +28,6 @@ async function makeTripAdvisorRequest(endpoint: string, params: Record<string, s
 
   return response.json();
 }
-
-// A cache to avoid re-fetching the same data multiple times in a single request.
-const locationCache = new Map<string, any>();
 
 async function getLocationDetails(locationId: string): Promise<any> {
     if (locationCache.has(locationId)) {
