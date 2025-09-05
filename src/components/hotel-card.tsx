@@ -39,12 +39,12 @@ export default function HotelCard({ hotel }: HotelCardProps) {
         <CardContent className="flex-grow space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                <span>{hotel.location}</span>
+                <span className="truncate">{hotel.location}</span>
             </div>
              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span className="font-semibold">{hotel.rating.toFixed(1)}</span>
-                ({hotel.reviews.length} reviews)
+                {hotel.reviews?.length > 0 && <span>({hotel.reviews.length} reviews)</span>}
             </div>
         </CardContent>
       </Link>
