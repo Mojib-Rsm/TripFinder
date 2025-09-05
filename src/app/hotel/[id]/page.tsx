@@ -52,6 +52,8 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
   if (!hotel) {
     notFound();
   }
+  
+  const tripComUrl = `https://www.trip.com/hotels/list?city=${encodeURIComponent(hotel.location)}&hotelname=${encodeURIComponent(hotel.name)}`;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -121,14 +123,12 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
               <Badge className="bg-green-100 text-green-800 text-lg py-1 px-4 mb-4">
                 Best Price Guarantee
               </Badge>
-              {hotel.web_url && (
-                <Button asChild className="w-full">
-                  <Link href={hotel.web_url} target="_blank" rel="noopener noreferrer">
-                    <Globe className="mr-2 h-4 w-4" />
-                    View on TripAdvisor
-                  </Link>
-                </Button>
-              )}
+              <Button asChild className="w-full">
+                <Link href={tripComUrl} target="_blank" rel="noopener noreferrer">
+                  <Globe className="mr-2 h-4 w-4" />
+                  View on Trip.com
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </div>
