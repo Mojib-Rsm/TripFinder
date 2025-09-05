@@ -1,8 +1,19 @@
 
 import TripSearchForm from "@/components/trip-search-form";
 import Image from "next/image";
+import { getHotelsByLocation } from "@/lib/data";
+import HotelCard from "@/components/hotel-card";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, BadgeCheck, ShieldCheck, Star } from "lucide-react";
+
+const topDestinations = [
+  { name: "Cox's Bazar", image: "https://picsum.photos/300/400?random=1", hint: "beach landscape" },
+  { name: "Dhaka", image: "https://picsum.photos/300/400?random=2", hint: "city skyline" },
+  { name: "Bangkok", image: "https://picsum.photos/300/400?random=3", hint: "thailand temple" },
+  { name: "Dubai", image: "https://picsum.photos/300/400?random=4", hint: "dubai skyscraper" },
+];
 
 const whyChooseUs = [
     {
@@ -13,7 +24,7 @@ const whyChooseUs = [
     {
         icon: <Award className="w-10 h-10 text-primary" />,
         title: 'Best Price Guarantee',
-        description: 'Find the best deals on flights worldwide.'
+        description: 'Find the best deals on flights and hotels worldwide.'
     },
     {
         icon: <ShieldCheck className="w-10 h-10 text-primary" />,
@@ -28,6 +39,8 @@ const whyChooseUs = [
 ]
 
 export default async function Home() {
+  const hotels = await getHotelsByLocation("Cox's Bazar");
+
   return (
     <>
       <section className="relative h-[80vh] min-h-[550px] flex items-center justify-center text-center text-white">
@@ -42,15 +55,50 @@ export default async function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-black/20 -z-10" />
 
         <div className="container mx-auto px-4 -mt-16">
-           <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4">
-            Find the best flight deals worldwide.
+          <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4">
+            Find the best hotels and deals worldwide.
           </h1>
           <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
-            Your journey begins here. Search for flights to plan your perfect trip.
+            Your journey begins here. Search for hotels, flights, and more to plan your perfect trip.
           </p>
           <div className="max-w-5xl mx-auto bg-white p-4 rounded-lg shadow-2xl">
             <TripSearchForm />
           </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h3 className="text-3xl font-bold font-headline mb-8 text-center">Top Destinations</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {topDestinations.map(dest => (
+              <Link key={dest.name} href={`/hotels?location=${dest.name}`}>
+                <Card className="overflow-hidden group">
+                    <div className="relative h-72">
+                        <Image src={dest.image} alt={dest.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" data-ai-hint={dest.hint} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-0 p-4">
+                            <h4 className="text-xl font-bold text-white">{dest.name}</h4>
+                        </div>
+                    </div>
+                    <CardContent className="p-4 bg-card">
+                         <Button variant="outline" className="w-full">Explore</Button>
+                    </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+            <h3 className="text-3xl font-bold font-headline mb-8 text-center">Best Deals Today</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                 {hotels.map((hotel) => (
+                    <HotelCard hotel={hotel} key={hotel.id} />
+                ))}
+            </div>
         </div>
       </section>
       

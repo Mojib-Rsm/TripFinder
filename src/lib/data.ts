@@ -1,8 +1,8 @@
+
 import type { Hotel, Review, Flight } from '@/lib/types';
 import { format } from 'date-fns';
 import { findNearbyAirportsFlow } from '@/ai/flows/nearby-airport-tool';
 
-const TRIPADVISOR_API_KEY = process.env.TRIPADVISOR_API_KEY;
 const AVIASALES_API_KEY = process.env.AVIASALES_API_KEY;
 const AVIASALES_PARTNER_ID = process.env.AVIASALES_PARTNER_ID;
 const TRIPADVISOR_BASE_URL = 'https://api.content.tripadvisor.com/api/v1';
@@ -15,27 +15,51 @@ async function makeTripAdvisorRequest(
   endpoint: string,
   params: Record<string, string>
 ) {
-  if (!TRIPADVISOR_API_KEY) {
-    throw new Error('TripAdvisor API key not configured');
-  }
-
-  const url = new URL(`${TRIPADVISOR_BASE_URL}${endpoint}`);
-  url.search = new URLSearchParams(params).toString();
-  url.searchParams.set('key', TRIPADVISOR_API_KEY);
-  url.searchParams.set('currency', 'USD');
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    console.error(await response.text());
-    throw new Error(`TripAdvisor API request failed: ${response.statusText}`);
-  }
-
-  return response.json();
+    // This is a mock implementation that returns placeholder data
+    console.warn("TripAdvisor API key not configured. Returning mock data.");
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (endpoint.includes('search')) {
+          resolve({
+            data: Array.from({ length: 10 }, (_, i) => ({
+              location_id: `${i + 1}`,
+              name: `Hotel Resort #${i + 1}`,
+            })),
+          });
+        } else if (endpoint.includes('photos')) {
+          resolve({
+            data: Array.from({ length: 5 }, (_, i) => ({
+              images: {
+                large: { url: `https://picsum.photos/800/600?random=${i}` },
+              },
+            })),
+          });
+        } else if (endpoint.includes('reviews')) {
+          resolve({
+            data: Array.from({ length: 5 }, (_, i) => ({
+              user: { username: `user${i}`},
+              rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0
+              text: `This is a sample review #${i + 1}. The stay was pleasant.`,
+            })),
+          });
+        } else { // details
+          const locationId = endpoint.split('/')[2];
+          resolve({
+            location_id: locationId,
+            name: `Hotel #${locationId} Name`,
+            description: `This is a detailed description for Hotel #${locationId}. It offers great amenities and a comfortable stay.`,
+            address_obj: { city: 'Dreamville', country: 'Fantasyland' },
+            price_level: '$50-$150',
+            rating: (Math.random() * 2 + 3).toFixed(1),
+            amenities: [{name: 'Free Wifi'}, {name: 'Swimming Pool'}, {name: 'Gym'}, {name: 'Parking'}],
+            web_url: 'https://www.tripadvisor.com',
+            hotel_class: '4 star',
+            styles: ['Modern', 'Family-friendly'],
+            spoken_languages: ['English', 'Spanish'],
+          });
+        }
+      }, 500);
+    });
 }
 
 async function getLocationDetails(locationId: string): Promise<any> {
