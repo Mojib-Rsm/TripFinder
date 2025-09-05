@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -124,7 +125,7 @@ const PersonalizedRecommendations = () => {
                     >
                       <div className="relative h-48 w-full">
                         <Image
-                          src={hotel.gallery[0]}
+                          src={hotel.gallery[0] || 'https://picsum.photos/400/300'}
                           alt={hotel.name}
                           data-ai-hint="hotel room"
                           fill

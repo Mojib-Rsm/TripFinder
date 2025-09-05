@@ -7,6 +7,7 @@ import HotelCard from "@/components/hotel-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, BadgeCheck, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
+import PersonalizedRecommendations from "@/components/personalized-recommendations";
 
 const topDestinations = [
   {
@@ -82,6 +83,8 @@ export default async function Home() {
         </div>
       </section>
       
+      <PersonalizedRecommendations />
+
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h3 className="text-3xl font-bold font-headline mb-8 text-center">Top Destinations</h3>
