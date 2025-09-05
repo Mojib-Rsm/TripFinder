@@ -1,7 +1,10 @@
 
-import type { Hotel, Review } from "@/lib/types";
+import type { Hotel, Review, Flight } from "@/lib/types";
+import { format } from "date-fns";
 
 const TRIPADVISOR_API_KEY = process.env.TRIPADVISOR_API_KEY;
+const AVIASALES_API_KEY = process.env.AVIASALES_API_KEY;
+const AVIASALES_PARTNER_ID = process.env.AVIASALES_PARTNER_ID;
 const BASE_URL = "https://api.content.tripadvisor.com/api/v1";
 
 // A module-level cache to avoid re-fetching the same data multiple times across requests.
@@ -160,3 +163,17 @@ export const staticHotelsForParamGeneration = [
     { id: "187147" }, // Example: A hotel in Paris
     { id: "191259" }, // Example: A hotel in Tokyo
 ];
+
+// Flights
+export async function getFlights(params: {
+  origin: string;
+  destination: string;
+  depart_date: string;
+  return_date?: string;
+}): Promise<Flight[]> {
+  const response = await fetch('/api/flights?' + new URLSearchParams(params));
+  if (!response.ok) {
+    throw new Error('Failed to fetch flights');
+  }
+  return response.json();
+}
