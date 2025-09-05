@@ -9,17 +9,17 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon, Search } from "lucide-react";
+import { CalendarIcon, Search, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { DateRange } from "react-day-picker";
 import { useSearchHistory } from "@/hooks/use-search-history";
+import { useSearchParams } from 'next/navigation'
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -33,15 +33,16 @@ const formSchema = z.object({
 
 export default function HotelSearchForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { addSearchToHistory } = useSearchHistory();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      location: "",
+      location: searchParams.get('location') || "",
       dates: {
-        from: undefined,
-        to: undefined,
+        from: searchParams.get('from') ? new Date(searchParams.get('from')!) : undefined,
+        to: searchParams.get('to') ? new Date(searchParams.get('to')!) : undefined,
       },
     },
   });
@@ -65,21 +66,23 @@ export default function HotelSearchForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col md:flex-row items-center gap-2 bg-background p-2 rounded-lg shadow-lg"
+        className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 bg-background p-2 rounded-lg shadow-lg"
       >
         <FormField
           control={form.control}
           name="location"
           render={({ field }) => (
-            <FormItem className="flex-grow w-full">
+            <FormItem className="md:col-span-1">
               <FormControl>
-                <Input
-                  placeholder="Where are you going?"
-                  {...field}
-                  className="h-12 text-base border-0 focus-visible:ring-2 focus-visible:ring-primary"
-                />
+                <div className="relative">
+                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                   <Input
+                    placeholder="Where are you going?"
+                    {...field}
+                    className="h-12 text-base border-0 focus-visible:ring-2 focus-visible:ring-primary pl-10"
+                  />
+                </div>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -87,14 +90,14 @@ export default function HotelSearchForm() {
           control={form.control}
           name="dates"
           render={({ field }) => (
-            <FormItem className="flex-grow w-full">
+            <FormItem className="md:col-span-2">
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "h-12 w-full md:w-[300px] justify-start text-left font-normal border-0 text-base",
+                        "h-12 w-full justify-start text-left font-normal border-0 text-base",
                         !field.value.from && "text-muted-foreground"
                       )}
                     >
@@ -109,7 +112,7 @@ export default function HotelSearchForm() {
                           format(field.value.from, "LLL dd, y")
                         )
                       ) : (
-                        <span>Pick your dates</span>
+                        <span>Check In - Check Out</span>
                       )}
                     </Button>
                   </FormControl>
@@ -126,13 +129,11 @@ export default function HotelSearchForm() {
                   />
                 </PopoverContent>
               </Popover>
-              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" size="lg" className="h-12 w-full md:w-auto">
-          <Search className="h-5 w-5 md:mr-2" />
-          <span className="hidden md:inline">Search</span>
+        <Button type="submit" size="lg" className="h-12 w-full md:w-auto text-base font-bold">
+          Search
         </Button>
       </form>
     </Form>

@@ -21,7 +21,7 @@ export default function Home() {
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
             Search deals on hotels, homes, and much more...
           </p>
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto backdrop-blur-sm bg-white/20 p-4 rounded-lg">
             <HotelSearchForm />
           </div>
         </div>
