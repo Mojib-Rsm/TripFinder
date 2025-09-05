@@ -5,7 +5,9 @@ import { format } from "date-fns";
 const TRIPADVISOR_API_KEY = process.env.TRIPADVISOR_API_KEY;
 const AVIASALES_API_KEY = process.env.AVIASALES_API_KEY;
 const AVIASALES_PARTNER_ID = process.env.AVIASALES_PARTNER_ID;
-const BASE_URL = "https://api.content.tripadvisor.com/api/v1";
+const TRIPADVISOR_BASE_URL = "https://api.content.tripadvisor.com/api/v1";
+const AVIASALES_API_URL = 'https://api.travelpayouts.com/v2/prices/latest';
+
 
 // A module-level cache to avoid re-fetching the same data multiple times across requests.
 const locationCache = new Map<string, any>();
@@ -15,7 +17,7 @@ async function makeTripAdvisorRequest(endpoint: string, params: Record<string, s
     throw new Error("TripAdvisor API key not configured");
   }
 
-  const url = new URL(`${BASE_URL}${endpoint}`);
+  const url = new URL(`${TRIPADVISOR_BASE_URL}${endpoint}`);
   url.search = new URLSearchParams(params).toString();
   url.searchParams.set("key", TRIPADVISOR_API_KEY);
   url.searchParams.set("currency", "USD");
@@ -171,9 +173,50 @@ export async function getFlights(params: {
   depart_date: string;
   return_date?: string;
 }): Promise<Flight[]> {
-  const response = await fetch('/api/flights?' + new URLSearchParams(params));
-  if (!response.ok) {
-    throw new Error('Failed to fetch flights');
+   if (!AVIASALES_API_KEY) {
+    throw new Error('Aviasales API key is not configured');
   }
-  return response.json();
+  
+  const apiParams: Record<string, string> = {
+    ...params,
+    token: AVIASALES_API_KEY,
+    currency: 'usd',
+    limit: '20'
+  };
+
+  try {
+    const response = await fetch(`${AVIASALES_API_URL}?${new URLSearchParams(apiParams)}`);
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Aviasales API error:', errorText);
+        throw new Error(`Error from Aviasales API: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+        return [];
+    }
+
+    const flights: Flight[] = data.data.map((flight: any) => ({
+      id: `${flight.origin}-${flight.destination}-${flight.flight_number}-${flight.departure_at}`,
+      origin: flight.origin,
+      destination: flight.destination,
+      origin_airport: flight.origin_airport,
+      destination_airport: flight.destination_airport,
+      price: flight.price,
+      airline: flight.airline,
+      flight_number: flight.flight_number,
+      departure_at: flight.departure_at,
+      return_at: flight.return_at,
+      transfers: flight.transfers,
+      duration: flight.duration,
+      link: flight.link,
+    }));
+    
+    return flights;
+  } catch (error) {
+    console.error('Error in getFlights:', error);
+    throw new Error('Error fetching flights');
+  }
 }

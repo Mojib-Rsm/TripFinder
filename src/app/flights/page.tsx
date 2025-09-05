@@ -1,3 +1,4 @@
+
 // src/app/flights/page.tsx
 import { getFlights } from "@/lib/data";
 import { Flight } from "@/lib/types";
@@ -9,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function FlightCard({ flight }: { flight: Flight }) {
   const partnerId = process.env.AVIASALES_PARTNER_ID;
-  const flightLink = `https://www.aviasales.com${flight.link}&marker=${partnerId}`;
+  const flightLink = `https://tp.media/click?shmarker=${partnerId}&promo_id=5457&source_type=link&type=click&campaign_id=100&trs=450435&origin=${flight.origin}&destination=${flight.destination}&flight_number=${flight.flight_number}&departure_date=${flight.departure_at.split('T')[0]}&return_date=${flight.return_at ? flight.return_at.split('T')[0] : ''}`;
 
   return (
     <Card className="transition-all hover:shadow-lg">

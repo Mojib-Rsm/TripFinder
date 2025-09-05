@@ -54,7 +54,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
     notFound();
   }
   
-  const tripComUrl = `https://www.trip.com/hotels/list?city=${encodeURIComponent(hotel.location)}&hotelname=${encodeURIComponent(hotel.name)}&Allianceid=7039397&SID=256995544`;
+  const tripComUrl = `https://tp.media/click?shmarker=${process.env.AVIASALES_PARTNER_ID}&promo_id=5457&source_type=link&type=click&campaign_id=100&trs=450435&hotel_id=${hotel.id}&check_in=2024-08-01&check_out=2024-08-03&adults=2&children=0&infants=0`;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -116,7 +116,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold mb-4">
-                ৳{hotel.price}{" "}
+                ${hotel.price}{" "}
                 <span className="text-base font-normal text-muted-foreground">
                   / night
                 </span>
