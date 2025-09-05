@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Hotel } from "@/lib/types";
@@ -42,7 +43,7 @@ const HotelCard = ({ hotel }: HotelCardProps) => {
         </CardContent>
         <CardFooter>
           <p className="text-lg font-semibold text-foreground">
-            BDT {hotel.price}
+            ${hotel.price}
             <span className="text-sm font-normal text-muted-foreground">
               {" "}
               / night

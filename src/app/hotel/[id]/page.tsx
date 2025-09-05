@@ -116,7 +116,7 @@ export default async function HotelPage({ params }: { params: { id: string } }) 
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold mb-4">
-                BDT {hotel.price}{" "}
+                ${hotel.price}{" "}
                 <span className="text-base font-normal text-muted-foreground">
                   / night
                 </span>

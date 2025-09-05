@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { CircleUserRound, MoreHorizontal } from "lucide-react";
@@ -25,7 +26,7 @@ const Header = () => {
         </div>
         <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">List Your Property</Button>
-            <span className="text-sm">BDT</span>
+            <span className="text-sm">USD</span>
             <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Customer Support</Button>
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
               <CircleUserRound className="w-6 h-6"/>
