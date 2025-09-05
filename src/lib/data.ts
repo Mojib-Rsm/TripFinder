@@ -15,7 +15,7 @@ async function makeTripAdvisorRequest(endpoint: string, params: Record<string, s
   const url = new URL(`${BASE_URL}${endpoint}`);
   url.search = new URLSearchParams(params).toString();
   url.searchParams.set("key", TRIPADVISOR_API_KEY);
-  url.searchParams.set("currency", "BDT");
+  url.searchParams.set("currency", "USD");
 
   const response = await fetch(url.toString(), {
     headers: {
@@ -56,9 +56,9 @@ async function getLocationDetails(locationId: string): Promise<any> {
 }
 
 function parsePrice(priceLevel?: string): number {
-    if (!priceLevel) return 5000; // Default price
+    if (!priceLevel) return 50; // Default price
     
-    // Example price level for BDT might be "৳5,000-৳10,000"
+    // Example price level might be "$50-$100"
     const priceRange = priceLevel.replace(/[^0-9-]/g, '').split('-').map(p => parseInt(p, 10));
     
     if (priceRange.length > 1 && !isNaN(priceRange[0]) && !isNaN(priceRange[1])) {
@@ -71,7 +71,7 @@ function parsePrice(priceLevel?: string): number {
         return priceRange[0];
     }
     
-    return 5000; // Fallback default price
+    return 50; // Fallback default price
 }
 
 function transformHotelData(details: any): Hotel {
